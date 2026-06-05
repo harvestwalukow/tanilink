@@ -1,5 +1,5 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router"
-import { Bell, CircleHelp, Search } from "lucide-react"
+import { Bell, ChevronDown, CircleHelp, Search } from "lucide-react"
 
 import { Footer } from "@/components/Common/Footer"
 import AppSidebar from "@/components/Sidebar/AppSidebar"
@@ -29,7 +29,7 @@ function Layout() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset className="bg-[radial-gradient(circle_at_top_left,_rgba(238,232,212,0.85),_transparent_32%),linear-gradient(180deg,_#fffdf7_0%,_#f9f3e8_100%)]">
-        <header className="sticky top-0 z-10 flex shrink-0 items-center border-b border-[#d7ccb9]/70 bg-[#fffaf1]/90 px-4 py-2.5 backdrop-blur-sm md:px-4.5">
+        <header className="sticky top-0 z-10 flex shrink-0 items-center border-b border-[#d7ccb9]/70 bg-[#fffaf1]/90 px-3 py-2 backdrop-blur-sm md:px-4">
           <div className="flex w-full items-center gap-3">
             <SidebarTrigger className="-ml-1 rounded-full border border-[#e4d8c5] bg-white text-[#6c655a] hover:bg-[#efe3cd] hover:text-[#163127]" />
             <div className="relative hidden max-w-[420px] flex-1 md:block">
@@ -37,11 +37,11 @@ function Layout() {
               <Input
                 value="Cari komoditas, lokasi, atau data..."
                 readOnly
-                className="h-10 rounded-2xl border-[#e3d7c6] bg-white pl-11 text-sm text-[#6c655a] shadow-none"
+                className="h-9 rounded-2xl border-[#e3d7c6] bg-white pl-11 text-sm text-[#6c655a] shadow-none"
               />
             </div>
             <Select defaultValue="jombang">
-              <SelectTrigger className="h-10 min-w-[180px] rounded-2xl border-[#e3d7c6] bg-white shadow-none">
+              <SelectTrigger className="h-9 min-w-[180px] rounded-2xl border-[#e3d7c6] bg-white shadow-none">
                 <SelectValue placeholder="Pilih wilayah" />
               </SelectTrigger>
               <SelectContent>
@@ -56,43 +56,44 @@ function Layout() {
                 </SelectGroup>
               </SelectContent>
             </Select>
-            <div className="ml-auto flex items-center gap-3">
+            <div className="ml-auto flex items-center gap-2.5">
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded-full border-[#e3d7c6] bg-white"
+                className="size-10 rounded-full border-[#e3d7c6] bg-white shadow-[0_1px_2px_rgba(117,92,48,0.05)]"
               >
                 <CircleHelp />
               </Button>
               <Button
                 variant="outline"
                 size="icon"
-                className="rounded-full border-[#e3d7c6] bg-white"
+                className="size-10 rounded-full border-[#e3d7c6] bg-white shadow-[0_1px_2px_rgba(117,92,48,0.05)]"
               >
                 <Bell />
               </Button>
               <Button
                 variant="outline"
-                className="h-10 rounded-2xl border-[#e3d7c6] bg-white px-4"
+                className="h-11 gap-3 rounded-[24px] border-[#e3d7c6] bg-white px-3.5 pr-3 text-left shadow-[0_1px_2px_rgba(117,92,48,0.05)] hover:bg-[#fffdf8]"
               >
-                <Avatar className="size-8">
+                <Avatar className="size-9">
                   <AvatarFallback className="bg-[#d97721] text-white">
                     AS
                   </AvatarFallback>
                 </Avatar>
-                <div className="hidden text-left md:block">
-                  <div className="text-sm font-semibold text-[#2c3c2d]">
+                <div className="hidden min-w-0 flex-1 text-left md:block">
+                  <div className="truncate text-[0.95rem] font-semibold leading-tight text-[#2c3c2d]">
                     Andi Setiawan
                   </div>
-                  <div className="text-xs text-[#7b7468]">
+                  <div className="truncate pt-0.5 text-[0.78rem] leading-tight text-[#7b7468]">
                     Penyuluh Pertanian
                   </div>
                 </div>
+                <ChevronDown className="hidden size-4 text-[#8a806f] md:block" />
               </Button>
             </div>
           </div>
         </header>
-        <main className="flex-1 p-3 md:p-4">
+        <main className="flex-1 p-2.5 md:p-3">
           <div className="mx-auto max-w-[1520px]">
             <Outlet />
           </div>

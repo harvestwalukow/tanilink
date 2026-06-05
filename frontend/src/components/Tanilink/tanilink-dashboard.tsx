@@ -5,6 +5,7 @@ import {
   CircleHelp,
   CloudRain,
   CloudSun,
+  Download,
   Droplets,
   Leaf,
   MapPin,
@@ -43,11 +44,11 @@ import {
 } from "@/components/ui/table"
 
 const suitabilityRows = [
-  { commodity: "Padi Sawah", marker: "PS", score: 87, badge: "Sangat Sesuai" },
-  { commodity: "Jagung", marker: "JG", score: 74, badge: "Sesuai" },
-  { commodity: "Cabai Merah", marker: "CM", score: 68, badge: "Cukup Sesuai" },
-  { commodity: "Bawang Merah", marker: "BM", score: 61, badge: "Cukup Sesuai" },
-  { commodity: "Tebu", marker: "TB", score: 58, badge: "Cukup Sesuai" },
+  { commodity: "Padi Sawah", score: 87, badge: "Sangat Sesuai" },
+  { commodity: "Jagung", score: 74, badge: "Sesuai" },
+  { commodity: "Cabai Merah", score: 68, badge: "Cukup Sesuai" },
+  { commodity: "Bawang Merah", score: 61, badge: "Cukup Sesuai" },
+  { commodity: "Tebu", score: 58, badge: "Cukup Sesuai" },
 ]
 
 const forecastSeries = [
@@ -137,10 +138,10 @@ const notifications = [
   },
 ] as const
 
-const CARD_HEADER = "px-5 pb-2 pt-4"
-const CARD_CONTENT = "px-5 pb-4"
-const CARD_FOOTER = "mt-auto justify-between px-5 pb-4 pt-3"
-const SECTION_HEADER = "gap-1 px-5 pb-2 pt-4"
+const CARD_HEADER = "px-4.5 pb-2 pt-3"
+const CARD_CONTENT = "px-4.5 pb-3"
+const CARD_FOOTER = "justify-between px-4.5 pb-3 pt-1.5"
+const SECTION_HEADER = "gap-1.5 px-4.5 pb-2 pt-3"
 
 function SectionTitle({
   title,
@@ -153,13 +154,13 @@ function SectionTitle({
 }) {
   return (
     <CardHeader className={SECTION_HEADER}>
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2.5">
         <div className="space-y-1">
           <CardTitle className="font-[Fraunces] text-[0.96rem] leading-tight tracking-[-0.03em] text-[#21382d] md:text-[1.04rem]">
             {title}
           </CardTitle>
           {description ? (
-            <CardDescription className="text-[10px] text-[#7d7467]">
+            <CardDescription className="text-[10px] leading-tight text-[#7d7467]">
               {description}
             </CardDescription>
           ) : null}
@@ -237,7 +238,7 @@ function ForecastChart() {
       <div className="mb-1 text-[9px] text-[#857d70]">Harga (Rp/kg)</div>
       <svg
         viewBox={`0 0 ${width} ${height}`}
-        className="h-[116px] w-full"
+        className="h-[98px] w-full"
         role="img"
         aria-labelledby="forecast-chart-title"
       >
@@ -295,7 +296,7 @@ function ForecastChart() {
 function MapPreview() {
   return (
     <div className="rounded-[16px] border border-[#ece2d2] bg-[#f8f4ea] p-2.5">
-      <div className="relative h-[150px] overflow-hidden rounded-[14px] border border-[#e2d7c4] bg-[radial-gradient(circle_at_18%_18%,rgba(154,197,151,0.18),transparent_24%),linear-gradient(180deg,#f4f0e7_0%,#e8e2d5_100%)]">
+      <div className="relative h-[128px] overflow-hidden rounded-[14px] border border-[#e2d7c4] bg-[radial-gradient(circle_at_18%_18%,rgba(154,197,151,0.18),transparent_24%),linear-gradient(180deg,#f4f0e7_0%,#e8e2d5_100%)]">
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_40%,rgba(180,213,183,0.65)_0%,rgba(180,213,183,0.65)_6%,transparent_6%),radial-gradient(circle_at_40%_52%,rgba(144,198,166,0.9)_0%,rgba(144,198,166,0.9)_5%,transparent_5%),radial-gradient(circle_at_56%_43%,rgba(227,207,139,0.95)_0%,rgba(227,207,139,0.95)_5%,transparent_5%),radial-gradient(circle_at_66%_56%,rgba(150,204,165,0.9)_0%,rgba(150,204,165,0.9)_6%,transparent_6%),radial-gradient(circle_at_78%_40%,rgba(182,223,183,0.75)_0%,rgba(182,223,183,0.75)_5%,transparent_5%)] opacity-80" />
         <div className="absolute left-[10%] top-[13%] h-[100px] w-[74%] rounded-[42%_58%_44%_56%/52%_38%_62%_48%] border border-[#8cb38a] bg-[linear-gradient(180deg,#b7dbb9_0%,#c8e8cb_100%)] opacity-90" />
         <div className="absolute left-[18%] top-[21%] h-[74px] w-[58%] rounded-[56%_44%_50%_50%/44%_56%_40%_60%] border border-dashed border-[#c5bea9]" />
@@ -346,7 +347,7 @@ function NotificationAlert({
     )
 
   return (
-    <Alert className="rounded-[14px] border-[#ecdcc8] bg-white px-3 py-2.5 shadow-none">
+    <Alert className="rounded-[14px] border-[#ecdcc8] bg-white px-3.5 py-2.5 shadow-none">
       {icon}
       <div className="flex w-full items-start justify-between gap-2">
         <div className="flex-1">
@@ -365,97 +366,109 @@ function NotificationAlert({
 
 export function TaniLinkDashboard() {
   return (
-    <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_290px] xl:items-start">
-      <div className="grid gap-3">
-        <div className="flex items-start justify-between gap-3">
-          <div className="space-y-0.5">
-            <h1 className="font-[Fraunces] text-[1.85rem] leading-[0.95] tracking-[-0.05em] text-[#1d3429] md:text-[2rem]">
-              Selamat pagi, Andi Setiawan
-            </h1>
-            <p className="text-[13px] text-[#6c675d]">
-              Ringkasan kondisi pertanian di Kab. Jombang, Jawa Timur
-            </p>
+    <div className="space-y-2.5 overflow-x-clip">
+      <div className="flex items-start justify-between gap-4">
+        <div className="space-y-0.5">
+          <h1 className="font-[Fraunces] text-[1.62rem] leading-[0.95] tracking-[-0.05em] text-[#1d3429] md:text-[1.82rem]">
+            Selamat pagi, Andi Setiawan
+          </h1>
+          <p className="text-[12px] text-[#6c675d]">
+            Ringkasan kondisi pertanian di Kab. Jombang, Jawa Timur
+          </p>
+        </div>
+        <Button className="hidden h-10 shrink-0 items-center gap-2 rounded-xl bg-[#215b39] px-4.5 text-sm text-white shadow-sm hover:bg-[#1a4a2f] lg:inline-flex">
+          <Download className="size-4" />
+          <span>Ekspor Laporan</span>
+        </Button>
+      </div>
+
+      <div className="grid gap-2.5 xl:grid-cols-[minmax(0,1fr)_320px] xl:items-start">
+        <div className="grid gap-2.5">
+          <div className="grid items-stretch gap-2.5 lg:grid-cols-[1.1fr_1fr_0.82fr]">
+            <Card className="flex h-full min-h-[118px] flex-col rounded-[20px] border-[#dce6d2] bg-[linear-gradient(135deg,#f8fbf3_0%,#eef5e6_100%)] shadow-sm">
+              <CardHeader className={CARD_HEADER}>
+                <div className="flex items-center gap-2 text-[#46633a]">
+                  <Leaf className="size-4" />
+                  <CardTitle className="text-[13px] font-semibold">
+                    Skor Kesesuaian Tertinggi
+                  </CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className={CARD_CONTENT}>
+                <div className="space-y-1">
+                  <div className="flex items-end gap-1">
+                    <span className="font-[Fraunces] text-[2.2rem] leading-none text-[#28432f]">
+                      87
+                    </span>
+                    <span className="pb-0.5 text-[1rem] text-[#6d695f]">
+                      /100
+                    </span>
+                  </div>
+                  <p className="text-[0.88rem] font-medium text-[#364233]">
+                    Padi Sawah
+                  </p>
+                  <ScorePill label="Sangat Sesuai" />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="flex h-full min-h-[118px] flex-col rounded-[20px] border-[#eddcc0] bg-[linear-gradient(135deg,#fffdf8_0%,#fff6e8_100%)] shadow-sm">
+              <CardHeader className={CARD_HEADER}>
+                <div className="flex items-center gap-2 text-[#c17c1f]">
+                  <TrendingUp className="size-4" />
+                  <CardTitle className="text-[13px] font-semibold">
+                    Prediksi Kenaikan Harga
+                  </CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className={CARD_CONTENT}>
+                <div className="space-y-1">
+                  <div className="font-[Fraunces] text-[2.1rem] leading-none text-[#3b2c1b]">
+                    +12,4%
+                  </div>
+                  <p className="text-[0.88rem] font-medium text-[#364233]">
+                    Rata-rata 5 komoditas utama
+                  </p>
+                  <Badge
+                    variant="secondary"
+                    className="rounded-md border-0 bg-[#f4efe4] px-2 py-0.5 text-[10px] font-medium text-[#6d6559]"
+                  >
+                    90 hari ke depan
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card className="flex h-full min-h-[118px] flex-col rounded-[20px] border-[#eadcc8] bg-[linear-gradient(180deg,#fffdfa_0%,#fff8ee_100%)] shadow-sm">
+              <CardHeader className={CARD_HEADER}>
+                <div className="flex items-center gap-2 text-[#7f5528]">
+                  <CalendarDays className="size-4" />
+                  <CardTitle className="text-[13px] font-semibold">
+                    Rekomendasi Tanam Aktif
+                  </CardTitle>
+                </div>
+              </CardHeader>
+              <CardContent className={CARD_CONTENT}>
+                <div className="space-y-0.5">
+                  <div className="font-[Fraunces] text-[2.1rem] leading-none text-[#3d342b]">
+                    3
+                  </div>
+                  <p className="text-[0.88rem] font-medium text-[#364233]">
+                    komoditas
+                  </p>
+                  <Badge
+                    variant="secondary"
+                    className="rounded-md border-0 bg-[#f4efe4] px-2 py-0.5 text-[10px] font-medium text-[#6d6559]"
+                  >
+                    Dalam 30 hari ke depan
+                  </Badge>
+                </div>
+              </CardContent>
+            </Card>
           </div>
-          <Button className="hidden h-9 rounded-xl bg-[#215b39] px-4 text-sm text-white shadow-sm hover:bg-[#1a4a2f] lg:inline-flex">
-            Ekspor Laporan
-          </Button>
-        </div>
 
-        <div className="grid items-stretch gap-3 lg:grid-cols-[1.12fr_1fr_0.78fr]">
-          <Card className="flex h-full min-h-[178px] flex-col rounded-[20px] border-[#dce6d2] bg-[linear-gradient(135deg,#f8fbf3_0%,#eef5e6_100%)] shadow-sm">
-            <CardHeader className={CARD_HEADER}>
-              <div className="flex items-center gap-2 text-[#46633a]">
-                <Leaf className="size-4" />
-                <CardTitle className="text-[13px] font-semibold">
-                  Skor Kesesuaian Tertinggi
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className={CARD_CONTENT}>
-              <div className="space-y-1.5">
-                <div className="flex items-end gap-1.5">
-                  <span className="font-[Fraunces] text-[2.75rem] leading-none text-[#28432f]">
-                    87
-                  </span>
-                  <span className="pb-0.5 text-[1.15rem] text-[#6d695f]">
-                    /100
-                  </span>
-                </div>
-                <p className="text-[0.92rem] font-medium text-[#364233]">
-                  Padi Sawah
-                </p>
-                <ScorePill label="Sangat Sesuai" />
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex h-full min-h-[178px] flex-col rounded-[20px] border-[#eddcc0] bg-[linear-gradient(135deg,#fffdf8_0%,#fff6e8_100%)] shadow-sm">
-            <CardHeader className={CARD_HEADER}>
-              <div className="flex items-center gap-2 text-[#c17c1f]">
-                <TrendingUp className="size-4" />
-                <CardTitle className="text-[13px] font-semibold">
-                  Prediksi Kenaikan Harga
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className={CARD_CONTENT}>
-              <div className="space-y-1.5">
-                <div className="font-[Fraunces] text-[2.55rem] leading-none text-[#3b2c1b]">
-                  +12,4%
-                </div>
-                <p className="text-[12px] text-[#6d6559]">
-                  Rata-rata 5 komoditas utama
-                </p>
-                <p className="text-[12px] text-[#6d6559]">90 hari ke depan</p>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="flex h-full min-h-[178px] flex-col rounded-[20px] border-[#eadcc8] bg-[linear-gradient(180deg,#fffdfa_0%,#fff8ee_100%)] shadow-sm">
-            <CardHeader className={CARD_HEADER}>
-              <div className="flex items-center gap-2 text-[#7f5528]">
-                <CalendarDays className="size-4" />
-                <CardTitle className="text-[13px] font-semibold">
-                  Rekomendasi Tanam Aktif
-                </CardTitle>
-              </div>
-            </CardHeader>
-            <CardContent className={CARD_CONTENT}>
-              <div className="space-y-1">
-                <div className="font-[Fraunces] text-[2.55rem] leading-none text-[#3d342b]">
-                  3
-                </div>
-                <p className="text-[12px] text-[#6d6559]">komoditas</p>
-                <p className="text-[12px] text-[#6d6559]">
-                  Dalam 30 hari ke depan
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        <div className="grid items-stretch gap-3 xl:grid-cols-[0.92fr_1.38fr]">
-          <Card className="flex h-full min-h-[344px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+        <div className="grid items-stretch gap-2.5 xl:grid-cols-[0.92fr_1.38fr]">
+          <Card className="flex h-full min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
             <SectionTitle
               title="Peringkat Kesesuaian Lahan"
               description="Skor kesesuaian komoditas di lokasi Anda"
@@ -465,7 +478,7 @@ export function TaniLinkDashboard() {
               <Table>
                 <TableHeader>
                   <TableRow className="border-[#f0e7d9] hover:bg-transparent">
-                    <TableHead className="px-0 text-[11px]">
+                    <TableHead className="px-2 text-[11px]">
                       Komoditas
                     </TableHead>
                     <TableHead className="text-[11px]">Skor (0-100)</TableHead>
@@ -477,17 +490,12 @@ export function TaniLinkDashboard() {
                 <TableBody>
                   {suitabilityRows.map((row) => (
                     <TableRow key={row.commodity} className="border-[#f2eadf]">
-                      <TableCell className="px-0 py-1.5">
-                        <div className="flex items-center gap-2.5">
-                          <span className="flex size-6.5 items-center justify-center rounded-full bg-[#eef3e6] text-[9px] font-semibold text-[#547048]">
-                            {row.marker}
-                          </span>
-                          <span className="text-[12px] font-medium text-[#30402f]">
-                            {row.commodity}
-                          </span>
-                        </div>
+                      <TableCell className="px-2 py-1">
+                        <span className="text-[12px] font-medium text-[#30402f]">
+                          {row.commodity}
+                        </span>
                       </TableCell>
-                      <TableCell className="py-1.5">
+                      <TableCell className="py-1">
                         <div className="flex items-center gap-2.5">
                           <div className="min-w-[72px] flex-1">
                             <StatBar value={row.score} />
@@ -497,7 +505,7 @@ export function TaniLinkDashboard() {
                           </span>
                         </div>
                       </TableCell>
-                      <TableCell className="py-1.5 text-right">
+                      <TableCell className="py-1 text-right">
                         <ScorePill label={row.badge} />
                       </TableCell>
                     </TableRow>
@@ -510,9 +518,9 @@ export function TaniLinkDashboard() {
             </CardFooter>
           </Card>
 
-          <Card className="flex h-full min-h-[344px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+          <Card className="flex h-full min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
             <SectionTitle
-              title="Prediksi Harga Komoditas (90 Hari) - Jawa Timur"
+              title="Prediksi Harga Komoditas"
               trailing={<CircleHelp className="mt-0.5 size-4 text-[#968d80]" />}
             />
             <CardContent className={`${CARD_CONTENT} space-y-3`}>
@@ -531,15 +539,14 @@ export function TaniLinkDashboard() {
               </Select>
               <ForecastChart />
             </CardContent>
-            <CardFooter className={`${CARD_FOOTER} text-[10px] text-[#8d8478]`}>
-              <span>Interval kepercayaan 80%</span>
+            <CardFooter className={CARD_FOOTER}>
               <CardLink label="Lihat detail & data" />
             </CardFooter>
           </Card>
         </div>
 
-        <div className="grid items-stretch gap-3 xl:grid-cols-[1.02fr_0.98fr]">
-          <Card className="flex h-full min-h-[294px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+        <div className="grid items-stretch gap-2.5 xl:grid-cols-[1.02fr_0.98fr]">
+          <Card className="flex h-full min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
             <SectionTitle
               title="Peta Wilayah & Lahan"
               description="Kab. Jombang, Jawa Timur"
@@ -553,44 +560,54 @@ export function TaniLinkDashboard() {
             </CardFooter>
           </Card>
 
-          <Card className="flex h-full min-h-[294px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+          <Card className="flex h-full min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
             <SectionTitle
-              title="Rekomendasi Tanam (30 Hari Ke Depan)"
+              title="Rekomendasi Tanam"
               trailing={<CircleHelp className="mt-0.5 size-4 text-[#968d80]" />}
             />
             <CardContent className={CARD_CONTENT}>
-              <div className="grid grid-cols-[18px_1fr] gap-2.5">
-                <div className="relative flex flex-col items-center pt-2">
-                  <span className="size-4 rounded-full border-[3px] border-[#5c9a59] bg-white" />
-                  <span className="mt-1 h-11 w-px bg-[#dccfbf]" />
-                  <span className="size-4 rounded-full border-[3px] border-[#efb33d] bg-white" />
-                  <span className="mt-1 h-11 w-px bg-[#dccfbf]" />
-                  <span className="size-4 rounded-full border-[3px] border-[#df7b65] bg-white" />
-                  <span className="absolute bottom-0 top-2 w-px bg-[#dccfbf] -z-10" />
-                </div>
-                <div className="space-y-1.5">
-                  {recommendations.map((item) => (
+              <div className="space-y-2">
+                {recommendations.map((item, index) => {
+                  const toneColor =
+                    item.badge === "Sangat Sesuai"
+                      ? "#5c9a59"
+                      : item.badge === "Sesuai"
+                        ? "#efb33d"
+                        : "#df7b65"
+
+                  return (
                     <div
                       key={item.title}
-                      className="rounded-[14px] border border-[#efe4d3] bg-[#fffdf9] px-3 py-2"
+                      className="grid grid-cols-[18px_1fr] items-center gap-2"
                     >
-                      <div className="mb-1 flex items-start justify-between gap-2">
-                        <div>
-                          <p className="text-[10px] text-[#8d8478]">
-                            {item.date}
-                          </p>
-                          <p className="mt-0.5 text-[12px] font-semibold text-[#2f3f2f]">
-                            {item.title}
-                          </p>
-                        </div>
-                        <ScorePill label={item.badge} />
+                      <div className="relative flex h-full min-h-[74px] items-center justify-center">
+                        {index < recommendations.length - 1 ? (
+                          <span className="absolute left-1/2 top-1/2 h-[calc(100%+0.5rem)] w-px -translate-x-1/2 bg-[#dccfbf]" />
+                        ) : null}
+                        <span
+                          className="relative z-10 size-4 rounded-full border-[3px] bg-white"
+                          style={{ borderColor: toneColor }}
+                        />
                       </div>
-                      <p className="text-[9px] leading-3.5 text-[#6d6559]">
-                        {item.body}
-                      </p>
+                      <div className="rounded-[14px] border border-[#efe4d3] bg-[#fffdf9] px-3 py-1.5">
+                        <div className="mb-0.5 flex items-start justify-between gap-2">
+                          <div>
+                            <p className="text-[10px] text-[#8d8478]">
+                              {item.date}
+                            </p>
+                            <p className="mt-0.5 text-[12px] font-semibold text-[#2f3f2f]">
+                              {item.title}
+                            </p>
+                          </div>
+                          <ScorePill label={item.badge} />
+                        </div>
+                        <p className="text-[9px] leading-3 text-[#6d6559]">
+                          {item.body}
+                        </p>
+                      </div>
                     </div>
-                  ))}
-                </div>
+                  )
+                })}
               </div>
             </CardContent>
             <CardFooter className={CARD_FOOTER}>
@@ -600,24 +617,25 @@ export function TaniLinkDashboard() {
         </div>
       </div>
 
-      <div className="grid gap-3">
-        <Button className="h-9 justify-self-end rounded-xl bg-[#215b39] px-4 text-sm text-white shadow-sm hover:bg-[#1a4a2f] lg:hidden">
-          Ekspor Laporan
-        </Button>
+        <div className="grid gap-3">
+          <Button className="h-10 justify-self-end rounded-xl bg-[#215b39] px-4 text-sm text-white shadow-sm hover:bg-[#1a4a2f] lg:hidden">
+            <Download className="size-4" />
+            <span>Ekspor Laporan</span>
+          </Button>
 
-        <Card className="flex min-h-[326px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+        <Card className="flex min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-[1.08]">
           <SectionTitle
             title="Cuaca Saat Ini"
             description="Jombang, Jawa Timur"
           />
           <CardContent className={`${CARD_CONTENT} space-y-3`}>
-            <div className="grid grid-cols-[auto_1fr] gap-2.5">
-              <div className="flex size-9 items-center justify-center rounded-full bg-[#fff4df]">
+            <div className="grid grid-cols-[auto_1fr] gap-2">
+              <div className="flex size-8.5 items-center justify-center rounded-full bg-[#fff4df]">
                 <CloudSun className="size-4.5 text-[#d79328]" />
               </div>
-              <div className="grid grid-cols-[1fr_auto] gap-2.5">
+              <div className="grid grid-cols-[1fr_auto] gap-2">
                 <div>
-                  <div className="font-[Fraunces] text-[2.05rem] leading-none text-[#23392d]">
+                  <div className="font-[Fraunces] text-[1.9rem] leading-none text-[#23392d]">
                     27°C
                   </div>
                   <p className="mt-0.5 text-[12px] text-[#666156]">
@@ -627,7 +645,7 @@ export function TaniLinkDashboard() {
                     Terasa seperti 31°C
                   </p>
                 </div>
-                <div className="space-y-1 text-[9px] text-[#615c53]">
+                <div className="space-y-0.5 text-[9px] text-[#615c53]">
                   <div className="flex items-center gap-1.5">
                     <Droplets className="size-3 text-[#2d7451]" />
                     <span>Kelembapan</span>
@@ -663,12 +681,9 @@ export function TaniLinkDashboard() {
               })}
             </div>
           </CardContent>
-          <CardFooter className={CARD_FOOTER}>
-            <CardLink label="Lihat prakiraan 7 hari" />
-          </CardFooter>
         </Card>
 
-        <Card className="flex min-h-[272px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+        <Card className="flex min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-1">
           <SectionTitle
             title="Kondisi Tanah"
             description="Lokasi Anda"
@@ -679,17 +694,17 @@ export function TaniLinkDashboard() {
               </div>
             }
           />
-          <CardContent className={`${CARD_CONTENT} pb-0`}>
+          <CardContent className={CARD_CONTENT}>
             <div className="grid grid-cols-3 gap-px overflow-hidden rounded-[14px] border border-[#efe4d3] bg-[#efe4d3]">
               {soilStats.map((item) => (
-                <div key={item.label} className="bg-[#fffdfa] p-2">
+                <div key={item.label} className="bg-[#fffdfa] p-1.5">
                   <div className="mb-1 flex items-center gap-1.5 text-[8px] text-[#6c665b]">
                     <span className="flex size-4 items-center justify-center rounded-full bg-[#f0f5eb] text-[#2d6d45]">
                       <Leaf className="size-2.5" />
                     </span>
                     <span>{item.label}</span>
                   </div>
-                  <p className="font-[Fraunces] text-[1.22rem] leading-none text-[#23392d]">
+                  <p className="font-[Fraunces] text-[1.1rem] leading-none text-[#23392d]">
                     {item.value}
                   </p>
                   <p className="mt-0.5 text-[8px] text-[#8b8173]">
@@ -699,22 +714,17 @@ export function TaniLinkDashboard() {
               ))}
             </div>
           </CardContent>
-          <CardFooter className={CARD_FOOTER}>
-            <CardLink label="Lihat rekomendasi ameliorasi" />
-          </CardFooter>
         </Card>
 
-        <Card className="flex min-h-[220px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+        <Card className="flex min-h-[148px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-[0.92]">
           <SectionTitle title="Peringatan & Informasi" />
-          <CardContent className={`${CARD_CONTENT} space-y-2`}>
+          <CardContent className={`${CARD_CONTENT} space-y-1.5`}>
             {notifications.map((item) => (
               <NotificationAlert key={item.title} {...item} />
             ))}
           </CardContent>
-          <CardFooter className={CARD_FOOTER}>
-            <CardLink label="Lihat semua notifikasi" />
-          </CardFooter>
         </Card>
+        </div>
       </div>
     </div>
   )
