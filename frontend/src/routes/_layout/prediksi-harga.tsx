@@ -1,16 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router"
 import {
   Download,
-  Eye,
-  EyeOff,
   HelpCircle,
   LineChart as LineChartIcon,
+  Sliders,
   Table as TableIcon,
 } from "lucide-react"
 import { useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import {
+  DropdownMenu,
+  DropdownMenuCheckboxItem,
+  DropdownMenuContent,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   Select,
   SelectContent,
@@ -281,39 +288,46 @@ function PrediksiHarga() {
               </SelectContent>
             </Select>
 
-            {/* Legend Toggles (only visible when all commodities are selected) */}
+            {/* Legend Toggles Dropdown (only visible when all commodities are selected) */}
             {selectedCommodity === "all" && (
-              <div className="hidden lg:flex items-center gap-2.5 border-l border-[#efe4d5] pl-3 ml-1">
-                <span className="text-[10px] font-bold text-[#8d8478] uppercase mr-1.5">
-                  Tampilkan:
-                </span>
-                {(Object.keys(commoditiesConfig) as CommodityKey[]).map(
-                  (comm) => {
-                    const active = visibleCommodities[comm]
-                    const cfg = commoditiesConfig[comm]
-                    return (
-                      <button
-                        type="button"
-                        key={comm}
-                        onClick={() => toggleVisibility(comm)}
-                        className={`flex items-center gap-1.5 px-2.5 py-1.25 rounded-lg border text-[10px] font-medium transition-all ${
-                          active
-                            ? "bg-white border-[#eadfcf] text-[#163127]"
-                            : "bg-[#f8f5ee] border-transparent text-[#9a907f] opacity-60"
-                        }`}
-                      >
-                        <span className={`size-1.5 rounded-full ${cfg.bg}`} />
-                        <span>{cfg.label}</span>
-                        {active ? (
-                          <Eye className="size-3 text-[#5c9a59]" />
-                        ) : (
-                          <EyeOff className="size-3 text-[#9a907f]" />
-                        )}
-                      </button>
-                    )
-                  },
-                )}
-              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="h-10 rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs font-semibold text-[#6c655a] shadow-none hover:bg-[#fffcf7] gap-2"
+                  >
+                    <Sliders className="size-3.5 text-[#8d8478]" />
+                    <span>Filter Tampilan</span>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-[180px] rounded-xl border-[#eadfcf] bg-white p-1.5 shadow-md">
+                  <DropdownMenuLabel className="text-[10px] font-bold text-[#8d8478] uppercase px-2 py-1">
+                    Tampilkan Komoditas
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator className="bg-[#f2eadf]" />
+                  {(Object.keys(commoditiesConfig) as CommodityKey[]).map(
+                    (comm) => {
+                      const active = visibleCommodities[comm]
+                      const cfg = commoditiesConfig[comm]
+                      return (
+                        <DropdownMenuCheckboxItem
+                          key={comm}
+                          checked={active}
+                          onCheckedChange={() => toggleVisibility(comm)}
+                          className="text-xs font-semibold text-[#163127] rounded-lg pr-2 py-1.5 focus:bg-[#fdfaf5] focus:text-[#163127]"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span
+                              className={`size-1.5 rounded-full ${cfg.bg}`}
+                            />
+                            <span>{cfg.label}</span>
+                          </div>
+                        </DropdownMenuCheckboxItem>
+                      )
+                    },
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
 

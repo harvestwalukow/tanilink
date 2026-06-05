@@ -14,6 +14,7 @@ import {
   TrendingUp,
   Wind,
 } from "lucide-react"
+import { useRef, useState } from "react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -213,9 +214,34 @@ function CardLink({ label, to }: { label: string; to: string }) {
   )
 }
 
-function ForecastChart() {
+const forecastDates = [
+  "19 Mei 2025",
+  "28 Mei 2025",
+  "7 Jun 2025",
+  "17 Jun 2025",
+  "26 Jun 2025",
+  "6 Jul 2025",
+  "15 Jul 2025",
+  "25 Jul 2025",
+  "3 Agu 2025",
+  "12 Agu 2025",
+]
+
+const getPrice = (label: string, pointVal: number) => {
+  if (label === "Padi") return pointVal * 200
+  if (label === "Jagung") return pointVal * 130
+  if (label === "Cabai Merah") return pointVal * 1500
+  if (label === "Bawang Merah") return pointVal * 2000
+  if (label === "Tebu") return pointVal * 290
+  return pointVal
+}
+
+function ForecastChart({ selectedComm }: { selectedComm: string }) {
   const width = 560
   const height = 110
+  const svgRef = useRef<SVGSVGElement | null>(null)
+  const [hoverIdx, setHoverIdx] = useState<number | null>(null)
+  const [hoverX, setHoverX] = useState<number | null>(null)
 
   const toPath = (points: number[]) =>
     points
@@ -226,25 +252,61 @@ function ForecastChart() {
       })
       .join(" ")
 
+  const isSeriesVisible = (label: string) => {
+    if (selectedComm === "semua") return true
+    if (selectedComm === "padi" && label === "Padi") return true
+    if (selectedComm === "jagung" && label === "Jagung") return true
+    if (selectedComm === "cabai" && label === "Cabai Merah") return true
+    if (selectedComm === "bawang" && label === "Bawang Merah") return true
+    if (selectedComm === "tebu" && label === "Tebu") return true
+    return false
+  }
+
+  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement, MouseEvent>) => {
+    if (!svgRef.current) return
+    const rect = svgRef.current.getBoundingClientRect()
+    const clientX = e.clientX - rect.left
+    const svgX = (clientX / rect.width) * width
+    const index = Math.min(9, Math.max(0, Math.round((svgX / width) * 9)))
+    setHoverIdx(index)
+    setHoverX((index / 9) * width)
+  }
+
+  const handleMouseLeave = () => {
+    setHoverIdx(null)
+    setHoverX(null)
+  }
+
   return (
-    <div className="rounded-[16px] border border-[#efe4d3] bg-[#fffefb] p-2.5">
+    <div className="relative rounded-[16px] border border-[#efe4d3] bg-[#fffefb] p-2.5">
       <div className="mb-1.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-[9px] text-[#71695c]">
-        {forecastSeries.map((series) => (
-          <div key={series.label} className="flex items-center gap-1.5">
-            <span
-              className="size-2 rounded-full"
-              style={{ backgroundColor: series.color }}
-            />
-            <span>{series.label}</span>
-          </div>
-        ))}
+        {forecastSeries.map((series) => {
+          const visible = isSeriesVisible(series.label)
+          return (
+            <div
+              key={series.label}
+              className={`flex items-center gap-1.5 transition-opacity ${visible ? "opacity-100" : "opacity-35"}`}
+            >
+              <span
+                className="size-2 rounded-full"
+                style={{ backgroundColor: series.color }}
+              />
+              <span className={visible ? "font-semibold text-[#163127]" : ""}>
+                {series.label}
+              </span>
+            </div>
+          )
+        })}
       </div>
       <div className="mb-1 text-[9px] text-[#857d70]">Harga (Rp/kg)</div>
       <svg
+        ref={svgRef}
         viewBox={`0 0 ${width} ${height}`}
-        className="h-[98px] w-full"
+        className="h-[98px] w-full cursor-crosshair overflow-visible select-none"
         role="img"
         aria-labelledby="forecast-chart-title"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
       >
         <title id="forecast-chart-title">
           Prediksi harga komoditas 90 hari
@@ -276,8 +338,44 @@ function ForecastChart() {
             stroke={series.color}
             strokeWidth="2.2"
             strokeLinecap="round"
+            strokeOpacity={isSeriesVisible(series.label) ? "1" : "0.15"}
+            className="transition-all duration-300"
           />
         ))}
+
+        {/* Vertical Hover Tracker Line */}
+        {hoverX !== null && (
+          <line
+            x1={hoverX}
+            y1="0"
+            x2={hoverX}
+            y2={height}
+            stroke="#8f7654"
+            strokeWidth="1.5"
+            strokeDasharray="2 3"
+          />
+        )}
+
+        {/* Hover Points Highlight Circle */}
+        {hoverIdx !== null &&
+          forecastSeries.map((series) => {
+            if (!isSeriesVisible(series.label)) return null
+            const pointVal = series.points[hoverIdx]
+            const x = (hoverIdx / 9) * width
+            const y = height - pointVal * 1.6
+            return (
+              <circle
+                key={series.label}
+                cx={x}
+                cy={y}
+                r="4"
+                fill={series.color}
+                stroke="#fff"
+                strokeWidth="1.5"
+                className="transition-all duration-75"
+              />
+            )
+          })}
       </svg>
       <div className="mt-1.5 grid grid-cols-7 items-center gap-1 text-[8px] text-[#93897a]">
         <span>19 Mei</span>
@@ -293,6 +391,49 @@ function ForecastChart() {
         <span>28 Jul</span>
         <span className="text-right">11 Agu</span>
       </div>
+
+      {/* Floating Tooltip Box */}
+      {hoverIdx !== null && hoverX !== null && (
+        <div
+          className="absolute z-10 w-[150px] rounded-xl border border-[#eadfcf] bg-white/95 p-2.5 shadow-md backdrop-blur-sm pointer-events-none transition-all duration-75 text-[9px] text-[#2c3c2d]"
+          style={{
+            top: "35px",
+            left:
+              hoverX > width / 2
+                ? `${(hoverX / width) * 100 - 29}%`
+                : `${(hoverX / width) * 100 + 4}%`,
+          }}
+        >
+          <div className="border-b border-[#f2eadf] pb-1 mb-1 font-bold text-[#163127]">
+            {forecastDates[hoverIdx]}
+          </div>
+          <div className="space-y-1">
+            {forecastSeries.map((series) => {
+              const visible = isSeriesVisible(series.label)
+              if (!visible && selectedComm !== "semua") return null
+              const pointVal = series.points[hoverIdx]
+              const price = getPrice(series.label, pointVal)
+              return (
+                <div
+                  key={series.label}
+                  className="flex items-center justify-between gap-1.5"
+                >
+                  <div className="flex items-center gap-1">
+                    <span
+                      className="size-1.5 rounded-full"
+                      style={{ backgroundColor: series.color }}
+                    />
+                    <span className="text-[#6c655a]">{series.label}:</span>
+                  </div>
+                  <span className="font-bold text-[#1d3429]">
+                    Rp {price.toLocaleString("id-ID")}
+                  </span>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
     </div>
   )
 }
@@ -369,6 +510,8 @@ function NotificationAlert({
 }
 
 export function TaniLinkDashboard() {
+  const [selectedComm, setSelectedComm] = useState("semua")
+
   return (
     <div className="space-y-2.5 overflow-x-clip">
       <div className="flex items-start justify-between gap-4">
@@ -484,9 +627,7 @@ export function TaniLinkDashboard() {
                 <Table>
                   <TableHeader>
                     <TableRow className="border-[#f0e7d9] hover:bg-transparent">
-                      <TableHead className="px-2 text-[11px]">
-                        Komoditas
-                      </TableHead>
+                      <TableHead className="text-[11px]">Komoditas</TableHead>
                       <TableHead className="text-[11px]">
                         Skor (0-100)
                       </TableHead>
@@ -501,7 +642,7 @@ export function TaniLinkDashboard() {
                         key={row.commodity}
                         className="border-[#f2eadf]"
                       >
-                        <TableCell className="px-2 py-1">
+                        <TableCell className="py-1">
                           <span className="text-[12px] font-medium text-[#30402f]">
                             {row.commodity}
                           </span>
@@ -540,7 +681,7 @@ export function TaniLinkDashboard() {
                 }
               />
               <CardContent className={`${CARD_CONTENT} space-y-3`}>
-                <Select defaultValue="semua">
+                <Select value={selectedComm} onValueChange={setSelectedComm}>
                   <SelectTrigger className="h-8 w-[145px] rounded-xl border-[#e5dacb] bg-[#fffdf8] text-[11px] shadow-none">
                     <SelectValue placeholder="Semua Komoditas" />
                   </SelectTrigger>
@@ -550,10 +691,12 @@ export function TaniLinkDashboard() {
                       <SelectItem value="padi">Padi</SelectItem>
                       <SelectItem value="jagung">Jagung</SelectItem>
                       <SelectItem value="cabai">Cabai Merah</SelectItem>
+                      <SelectItem value="bawang">Bawang Merah</SelectItem>
+                      <SelectItem value="tebu">Tebu</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
-                <ForecastChart />
+                <ForecastChart selectedComm={selectedComm} />
               </CardContent>
               <CardFooter className={CARD_FOOTER}>
                 <CardLink label="Lihat detail & data" to="/prediksi-harga" />

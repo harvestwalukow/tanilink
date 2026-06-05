@@ -118,8 +118,6 @@
   }
   html {
     font-family: "Manrope", sans-serif;
-    scrollbar-gutter: stable;
-    overflow-y: scroll;
   }
   body {
     @apply bg-background text-foreground;
@@ -131,15 +129,37 @@
       ),
       linear-gradient(180deg, #fffdf7 0%, #f7f0e3 100%);
   }
-  html[data-scroll-locked],
-  body[data-scroll-locked],
-  html[style*="overflow: hidden"] {
-    margin-right: 0;
-    padding-right: 0;
-  }
 
   button,
   [role="button"] {
     cursor: pointer;
   }
+}
+
+/* Keep the scrollbar always visible to prevent scrollbar disappearance and track shifts */
+html {
+  overflow-y: scroll;
+}
+
+/* Force zero scrollbar compensation padding/margin when locked to prevent any layout shifts or gaps */
+html[data-scroll-locked],
+body[data-scroll-locked],
+html[style*="overflow: hidden"],
+body[style*="overflow: hidden"],
+[data-scroll-locked],
+html[data-scroll-locked] [style*="padding-right"],
+html[style*="overflow: hidden"] [style*="padding-right"],
+body[style*="overflow: hidden"] [style*="padding-right"],
+html[data-scroll-locked] [style*="margin-right"],
+html[style*="overflow: hidden"] [style*="margin-right"],
+body[style*="overflow: hidden"] [style*="margin-right"],
+html[data-scroll-locked] body,
+html[style*="overflow: hidden"] body,
+html[data-scroll-locked] header,
+html[style*="overflow: hidden"] header,
+html[data-scroll-locked] [data-sidebar],
+html[style*="overflow: hidden"] [data-sidebar] {
+  margin-right: 0px;
+  padding-right: 0px;
+  --removed-body-scroll-bar-size: 0px;
 }
