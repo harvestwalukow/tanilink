@@ -445,7 +445,7 @@ function MapPreview() {
         <div className="absolute inset-0 bg-[radial-gradient(circle_at_28%_40%,rgba(180,213,183,0.65)_0%,rgba(180,213,183,0.65)_6%,transparent_6%),radial-gradient(circle_at_40%_52%,rgba(144,198,166,0.9)_0%,rgba(144,198,166,0.9)_5%,transparent_5%),radial-gradient(circle_at_56%_43%,rgba(227,207,139,0.95)_0%,rgba(227,207,139,0.95)_5%,transparent_5%),radial-gradient(circle_at_66%_56%,rgba(150,204,165,0.9)_0%,rgba(150,204,165,0.9)_6%,transparent_6%),radial-gradient(circle_at_78%_40%,rgba(182,223,183,0.75)_0%,rgba(182,223,183,0.75)_5%,transparent_5%)] opacity-80" />
         <div className="absolute left-[10%] top-[13%] h-[100px] w-[74%] rounded-[42%_58%_44%_56%/52%_38%_62%_48%] border border-[#8cb38a] bg-[linear-gradient(180deg,#b7dbb9_0%,#c8e8cb_100%)] opacity-90" />
         <div className="absolute left-[18%] top-[21%] h-[74px] w-[58%] rounded-[56%_44%_50%_50%/44%_56%_40%_60%] border border-dashed border-[#c5bea9]" />
-        <div className="absolute left-[42%] top-[39%] flex size-7 items-center justify-center rounded-full bg-[#214f3c] text-white shadow-lg">
+        <div className="absolute left-[42%] top-[39%] flex size-7 items-center justify-center rounded-full bg-primary text-white shadow-lg">
           <MapPin className="size-4 fill-current" />
         </div>
         <div className="absolute bottom-2 left-2 right-2 flex flex-wrap items-center gap-1.5 rounded-full bg-white/92 px-2 py-0.75 text-[7px] text-[#6f6659] shadow-sm">
@@ -523,7 +523,7 @@ export function TaniLinkDashboard() {
             Ringkasan kondisi pertanian di Kab. Jombang, Jawa Timur
           </p>
         </div>
-        <Button className="hidden h-10 shrink-0 items-center gap-2 rounded-xl bg-[#215b39] px-4.5 text-sm text-white shadow-sm hover:bg-[#1a4a2f] lg:inline-flex">
+        <Button className="hidden h-10 shrink-0 items-center gap-2 rounded-xl bg-primary px-4.5 text-sm text-white shadow-sm hover:bg-[#24473b] lg:inline-flex">
           <Download className="size-4" />
           <span>Ekspor Laporan</span>
         </Button>
@@ -784,7 +784,7 @@ export function TaniLinkDashboard() {
         </div>
 
         <div className="grid gap-3">
-          <Button className="h-10 justify-self-end rounded-xl bg-[#215b39] px-4 text-sm text-white shadow-sm hover:bg-[#1a4a2f] lg:hidden">
+          <Button className="h-10 justify-self-end rounded-xl bg-primary px-4 text-sm text-white shadow-sm hover:bg-[#24473b] lg:hidden">
             <Download className="size-4" />
             <span>Ekspor Laporan</span>
           </Button>

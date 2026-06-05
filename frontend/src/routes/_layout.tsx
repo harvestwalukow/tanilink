@@ -3,7 +3,7 @@ import { Bell, ChevronDown, CircleHelp, Search } from "lucide-react"
 
 import { Footer } from "@/components/Common/Footer"
 import AppSidebar from "@/components/Sidebar/AppSidebar"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
+
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import {
@@ -73,22 +73,17 @@ function Layout() {
               </Button>
               <Button
                 variant="outline"
-                className="h-11 gap-3 rounded-[24px] border-[#e3d7c6] bg-white px-3.5 pr-3 text-left shadow-[0_1px_2px_rgba(117,92,48,0.05)] hover:bg-[#fffdf8]"
+                className="h-11 gap-3 rounded-[24px] border-[#e3d7c6] bg-white pl-5! pr-4! text-left shadow-[0_1px_2px_rgba(117,92,48,0.05)] hover:bg-[#fffdf8]"
               >
-                <Avatar className="size-9">
-                  <AvatarFallback className="bg-[#d97721] text-white">
-                    AS
-                  </AvatarFallback>
-                </Avatar>
-                <div className="hidden min-w-0 flex-1 text-left md:block">
+                <div className="min-w-0 flex-1 text-left">
                   <div className="truncate text-[0.95rem] font-semibold leading-tight text-[#2c3c2d]">
                     Andi Setiawan
                   </div>
                   <div className="truncate pt-0.5 text-[0.78rem] leading-tight text-[#7b7468]">
-                    Penyuluh Pertanian
+                    Petani
                   </div>
                 </div>
-                <ChevronDown className="hidden size-4 text-[#8a806f] md:block" />
+                <ChevronDown className="size-4 text-[#8a806f]" />
               </Button>
             </div>
           </div>

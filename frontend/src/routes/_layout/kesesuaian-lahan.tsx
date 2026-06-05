@@ -489,7 +489,7 @@ function KesesuaianLahan() {
                           }}
                           className={`size-7 rounded-lg text-[10px] font-medium flex items-center justify-center transition-all ${
                             isSelected
-                              ? "bg-[#2f5d50] text-white font-bold"
+                              ? "bg-primary text-primary-foreground font-bold"
                               : isToday
                                 ? "bg-[#e5efe9] text-[#2d6d45] border border-[#2d6d45]/20 font-bold"
                                 : "text-[#3b3b34] hover:bg-[#faf6ee]"
@@ -508,7 +508,7 @@ function KesesuaianLahan() {
           {/* Download CSV */}
           <Button
             onClick={handleDownloadCSV}
-            className="h-10 rounded-xl bg-[#215b39] px-4 text-xs font-semibold text-white shadow-sm hover:bg-[#1a4a2f] gap-2 md:w-auto"
+            className="h-10 rounded-xl bg-primary px-4 text-xs font-semibold text-white shadow-sm hover:bg-[#24473b] gap-2 md:w-auto"
           >
             <Download className="size-4" />
             <span>Unduh CSV</span>
@@ -641,7 +641,7 @@ function KesesuaianLahan() {
                     onClick={() => handlePageChange(i + 1)}
                     className={`h-8 w-8 p-0 rounded-lg shadow-none text-xs ${
                       currentPage === i + 1
-                        ? "bg-[#2f5d50] text-white hover:bg-[#204037] font-semibold"
+                        ? "bg-primary text-primary-foreground hover:bg-[#24473b] font-semibold"
                         : "border-[#e5dacb] bg-[#fffdfa] text-[#6c655a] hover:bg-[#fffcf7]"
                     }`}
                   >

@@ -453,7 +453,7 @@ function RekomendasiTanam() {
             {/* Close action */}
             <div className="mt-4 pt-3 border-t border-[#f2eadf] flex justify-end">
               <DialogClose asChild>
-                <Button className="h-9 px-4 rounded-xl bg-[#2f5d50] text-xs font-semibold text-white shadow-sm hover:bg-[#204037]">
+                <Button className="h-9 px-4 rounded-xl bg-primary text-xs font-semibold text-white shadow-sm hover:bg-[#24473b]">
                   Tutup Panduan
                 </Button>
               </DialogClose>
