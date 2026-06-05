@@ -36,7 +36,7 @@ export function Main({ items }: MainProps) {
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map((item) => {
-            const isActive = item.title === "Beranda" && currentPath === "/"
+            const isActive = currentPath === item.path
 
             return (
               <SidebarMenuItem key={item.title}>

@@ -19,11 +19,11 @@ import { type Item, Main } from "./Main"
 
 const baseItems: Item[] = [
   { icon: Home, title: "Beranda", path: "/" },
-  { icon: Sprout, title: "Kesesuaian Lahan", path: "/" },
-  { icon: BarChart3, title: "Prediksi Harga", path: "/" },
-  { icon: Landmark, title: "Rekomendasi Tanam", path: "/" },
-  { icon: MapIcon, title: "Peta & Wilayah", path: "/" },
-  { icon: Settings, title: "Pengaturan", path: "/" },
+  { icon: Sprout, title: "Kesesuaian Lahan", path: "/kesesuaian-lahan" },
+  { icon: BarChart3, title: "Prediksi Harga", path: "/prediksi-harga" },
+  { icon: Landmark, title: "Rekomendasi Tanam", path: "/rekomendasi-tanam" },
+  { icon: MapIcon, title: "Peta & Wilayah", path: "/peta-wilayah" },
+  { icon: Settings, title: "Pengaturan", path: "/settings" },
 ]
 
 export function AppSidebar() {

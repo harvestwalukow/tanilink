@@ -16,6 +16,10 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as LayoutIndexRouteImport } from './routes/_layout/index'
 import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
+import { Route as LayoutRekomendasiTanamRouteImport } from './routes/_layout/rekomendasi-tanam'
+import { Route as LayoutPrediksiHargaRouteImport } from './routes/_layout/prediksi-harga'
+import { Route as LayoutPetaWilayahRouteImport } from './routes/_layout/peta-wilayah'
+import { Route as LayoutKesesuaianLahanRouteImport } from './routes/_layout/kesesuaian-lahan'
 import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
 import { Route as LayoutAdminRouteImport } from './routes/_layout/admin'
 
@@ -53,6 +57,26 @@ const LayoutSettingsRoute = LayoutSettingsRouteImport.update({
   path: '/settings',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutRekomendasiTanamRoute = LayoutRekomendasiTanamRouteImport.update({
+  id: '/rekomendasi-tanam',
+  path: '/rekomendasi-tanam',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutPrediksiHargaRoute = LayoutPrediksiHargaRouteImport.update({
+  id: '/prediksi-harga',
+  path: '/prediksi-harga',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutPetaWilayahRoute = LayoutPetaWilayahRouteImport.update({
+  id: '/peta-wilayah',
+  path: '/peta-wilayah',
+  getParentRoute: () => LayoutRoute,
+} as any)
+const LayoutKesesuaianLahanRoute = LayoutKesesuaianLahanRouteImport.update({
+  id: '/kesesuaian-lahan',
+  path: '/kesesuaian-lahan',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutItemsRoute = LayoutItemsRouteImport.update({
   id: '/items',
   path: '/items',
@@ -72,6 +96,10 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
   '/items': typeof LayoutItemsRoute
+  '/kesesuaian-lahan': typeof LayoutKesesuaianLahanRoute
+  '/peta-wilayah': typeof LayoutPetaWilayahRoute
+  '/prediksi-harga': typeof LayoutPrediksiHargaRoute
+  '/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
   '/settings': typeof LayoutSettingsRoute
 }
 export interface FileRoutesByTo {
@@ -81,6 +109,10 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/admin': typeof LayoutAdminRoute
   '/items': typeof LayoutItemsRoute
+  '/kesesuaian-lahan': typeof LayoutKesesuaianLahanRoute
+  '/peta-wilayah': typeof LayoutPetaWilayahRoute
+  '/prediksi-harga': typeof LayoutPrediksiHargaRoute
+  '/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
   '/settings': typeof LayoutSettingsRoute
   '/': typeof LayoutIndexRoute
 }
@@ -93,6 +125,10 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/_layout/admin': typeof LayoutAdminRoute
   '/_layout/items': typeof LayoutItemsRoute
+  '/_layout/kesesuaian-lahan': typeof LayoutKesesuaianLahanRoute
+  '/_layout/peta-wilayah': typeof LayoutPetaWilayahRoute
+  '/_layout/prediksi-harga': typeof LayoutPrediksiHargaRoute
+  '/_layout/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
   '/_layout/settings': typeof LayoutSettingsRoute
   '/_layout/': typeof LayoutIndexRoute
 }
@@ -106,6 +142,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin'
     | '/items'
+    | '/kesesuaian-lahan'
+    | '/peta-wilayah'
+    | '/prediksi-harga'
+    | '/rekomendasi-tanam'
     | '/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -115,6 +155,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/admin'
     | '/items'
+    | '/kesesuaian-lahan'
+    | '/peta-wilayah'
+    | '/prediksi-harga'
+    | '/rekomendasi-tanam'
     | '/settings'
     | '/'
   id:
@@ -126,6 +170,10 @@ export interface FileRouteTypes {
     | '/signup'
     | '/_layout/admin'
     | '/_layout/items'
+    | '/_layout/kesesuaian-lahan'
+    | '/_layout/peta-wilayah'
+    | '/_layout/prediksi-harga'
+    | '/_layout/rekomendasi-tanam'
     | '/_layout/settings'
     | '/_layout/'
   fileRoutesById: FileRoutesById
@@ -189,6 +237,34 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutSettingsRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/rekomendasi-tanam': {
+      id: '/_layout/rekomendasi-tanam'
+      path: '/rekomendasi-tanam'
+      fullPath: '/rekomendasi-tanam'
+      preLoaderRoute: typeof LayoutRekomendasiTanamRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/prediksi-harga': {
+      id: '/_layout/prediksi-harga'
+      path: '/prediksi-harga'
+      fullPath: '/prediksi-harga'
+      preLoaderRoute: typeof LayoutPrediksiHargaRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/peta-wilayah': {
+      id: '/_layout/peta-wilayah'
+      path: '/peta-wilayah'
+      fullPath: '/peta-wilayah'
+      preLoaderRoute: typeof LayoutPetaWilayahRouteImport
+      parentRoute: typeof LayoutRoute
+    }
+    '/_layout/kesesuaian-lahan': {
+      id: '/_layout/kesesuaian-lahan'
+      path: '/kesesuaian-lahan'
+      fullPath: '/kesesuaian-lahan'
+      preLoaderRoute: typeof LayoutKesesuaianLahanRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/items': {
       id: '/_layout/items'
       path: '/items'
@@ -209,6 +285,10 @@ declare module '@tanstack/react-router' {
 interface LayoutRouteChildren {
   LayoutAdminRoute: typeof LayoutAdminRoute
   LayoutItemsRoute: typeof LayoutItemsRoute
+  LayoutKesesuaianLahanRoute: typeof LayoutKesesuaianLahanRoute
+  LayoutPetaWilayahRoute: typeof LayoutPetaWilayahRoute
+  LayoutPrediksiHargaRoute: typeof LayoutPrediksiHargaRoute
+  LayoutRekomendasiTanamRoute: typeof LayoutRekomendasiTanamRoute
   LayoutSettingsRoute: typeof LayoutSettingsRoute
   LayoutIndexRoute: typeof LayoutIndexRoute
 }
@@ -216,6 +296,10 @@ interface LayoutRouteChildren {
 const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAdminRoute: LayoutAdminRoute,
   LayoutItemsRoute: LayoutItemsRoute,
+  LayoutKesesuaianLahanRoute: LayoutKesesuaianLahanRoute,
+  LayoutPetaWilayahRoute: LayoutPetaWilayahRoute,
+  LayoutPrediksiHargaRoute: LayoutPrediksiHargaRoute,
+  LayoutRekomendasiTanamRoute: LayoutRekomendasiTanamRoute,
   LayoutSettingsRoute: LayoutSettingsRoute,
   LayoutIndexRoute: LayoutIndexRoute,
 }

@@ -1,3 +1,4 @@
+import { Link } from "@tanstack/react-router"
 import {
   AlertTriangle,
   ArrowRight,
@@ -200,12 +201,15 @@ function ScorePill({ label }: { label: string }) {
   )
 }
 
-function CardLink({ label }: { label: string }) {
+function CardLink({ label, to }: { label: string; to: string }) {
   return (
-    <div className="flex items-center gap-1.5 text-[12px] font-medium text-[#2d603d]">
+    <Link
+      to={to}
+      className="flex items-center gap-1.5 text-[12px] font-medium text-[#2d603d] hover:underline"
+    >
       <span>{label}</span>
       <ArrowRight className="size-3.5" />
-    </div>
+    </Link>
   )
 }
 
@@ -467,155 +471,174 @@ export function TaniLinkDashboard() {
             </Card>
           </div>
 
-        <div className="grid items-stretch gap-2.5 xl:grid-cols-[0.92fr_1.38fr]">
-          <Card className="flex h-full min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-            <SectionTitle
-              title="Peringkat Kesesuaian Lahan"
-              description="Skor kesesuaian komoditas di lokasi Anda"
-              trailing={<CircleHelp className="mt-0.5 size-4 text-[#968d80]" />}
-            />
-            <CardContent className={CARD_CONTENT}>
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-[#f0e7d9] hover:bg-transparent">
-                    <TableHead className="px-2 text-[11px]">
-                      Komoditas
-                    </TableHead>
-                    <TableHead className="text-[11px]">Skor (0-100)</TableHead>
-                    <TableHead className="text-right text-[11px]">
-                      Kelas
-                    </TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {suitabilityRows.map((row) => (
-                    <TableRow key={row.commodity} className="border-[#f2eadf]">
-                      <TableCell className="px-2 py-1">
-                        <span className="text-[12px] font-medium text-[#30402f]">
-                          {row.commodity}
-                        </span>
-                      </TableCell>
-                      <TableCell className="py-1">
-                        <div className="flex items-center gap-2.5">
-                          <div className="min-w-[72px] flex-1">
-                            <StatBar value={row.score} />
-                          </div>
-                          <span className="min-w-7 text-[12px] text-[#615c53]">
-                            {row.score}
-                          </span>
-                        </div>
-                      </TableCell>
-                      <TableCell className="py-1 text-right">
-                        <ScorePill label={row.badge} />
-                      </TableCell>
+          <div className="grid items-stretch gap-2.5 xl:grid-cols-[0.92fr_1.38fr]">
+            <Card className="flex h-full min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+              <SectionTitle
+                title="Peringkat Kesesuaian Lahan"
+                description="Skor kesesuaian komoditas di lokasi Anda"
+                trailing={
+                  <CircleHelp className="mt-0.5 size-4 text-[#968d80]" />
+                }
+              />
+              <CardContent className={CARD_CONTENT}>
+                <Table>
+                  <TableHeader>
+                    <TableRow className="border-[#f0e7d9] hover:bg-transparent">
+                      <TableHead className="px-2 text-[11px]">
+                        Komoditas
+                      </TableHead>
+                      <TableHead className="text-[11px]">
+                        Skor (0-100)
+                      </TableHead>
+                      <TableHead className="text-right text-[11px]">
+                        Kelas
+                      </TableHead>
                     </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
-            </CardContent>
-            <CardFooter className={CARD_FOOTER}>
-              <CardLink label="Lihat analisis lengkap" />
-            </CardFooter>
-          </Card>
-
-          <Card className="flex h-full min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-            <SectionTitle
-              title="Prediksi Harga Komoditas"
-              trailing={<CircleHelp className="mt-0.5 size-4 text-[#968d80]" />}
-            />
-            <CardContent className={`${CARD_CONTENT} space-y-3`}>
-              <Select defaultValue="semua">
-                <SelectTrigger className="h-8 w-[145px] rounded-xl border-[#e5dacb] bg-[#fffdf8] text-[11px] shadow-none">
-                  <SelectValue placeholder="Semua Komoditas" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectItem value="semua">Semua Komoditas</SelectItem>
-                    <SelectItem value="padi">Padi</SelectItem>
-                    <SelectItem value="jagung">Jagung</SelectItem>
-                    <SelectItem value="cabai">Cabai Merah</SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-              <ForecastChart />
-            </CardContent>
-            <CardFooter className={CARD_FOOTER}>
-              <CardLink label="Lihat detail & data" />
-            </CardFooter>
-          </Card>
-        </div>
-
-        <div className="grid items-stretch gap-2.5 xl:grid-cols-[1.02fr_0.98fr]">
-          <Card className="flex h-full min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-            <SectionTitle
-              title="Peta Wilayah & Lahan"
-              description="Kab. Jombang, Jawa Timur"
-              trailing={<CircleHelp className="mt-0.5 size-4 text-[#968d80]" />}
-            />
-            <CardContent className={CARD_CONTENT}>
-              <MapPreview />
-            </CardContent>
-            <CardFooter className={CARD_FOOTER}>
-              <CardLink label="Buka peta interaktif" />
-            </CardFooter>
-          </Card>
-
-          <Card className="flex h-full min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-            <SectionTitle
-              title="Rekomendasi Tanam"
-              trailing={<CircleHelp className="mt-0.5 size-4 text-[#968d80]" />}
-            />
-            <CardContent className={CARD_CONTENT}>
-              <div className="space-y-2">
-                {recommendations.map((item, index) => {
-                  const toneColor =
-                    item.badge === "Sangat Sesuai"
-                      ? "#5c9a59"
-                      : item.badge === "Sesuai"
-                        ? "#efb33d"
-                        : "#df7b65"
-
-                  return (
-                    <div
-                      key={item.title}
-                      className="grid grid-cols-[18px_1fr] items-center gap-2"
-                    >
-                      <div className="relative flex h-full min-h-[74px] items-center justify-center">
-                        {index < recommendations.length - 1 ? (
-                          <span className="absolute left-1/2 top-1/2 h-[calc(100%+0.5rem)] w-px -translate-x-1/2 bg-[#dccfbf]" />
-                        ) : null}
-                        <span
-                          className="relative z-10 size-4 rounded-full border-[3px] bg-white"
-                          style={{ borderColor: toneColor }}
-                        />
-                      </div>
-                      <div className="rounded-[14px] border border-[#efe4d3] bg-[#fffdf9] px-3 py-1.5">
-                        <div className="mb-0.5 flex items-start justify-between gap-2">
-                          <div>
-                            <p className="text-[10px] text-[#8d8478]">
-                              {item.date}
-                            </p>
-                            <p className="mt-0.5 text-[12px] font-semibold text-[#2f3f2f]">
-                              {item.title}
-                            </p>
+                  </TableHeader>
+                  <TableBody>
+                    {suitabilityRows.map((row) => (
+                      <TableRow
+                        key={row.commodity}
+                        className="border-[#f2eadf]"
+                      >
+                        <TableCell className="px-2 py-1">
+                          <span className="text-[12px] font-medium text-[#30402f]">
+                            {row.commodity}
+                          </span>
+                        </TableCell>
+                        <TableCell className="py-1">
+                          <div className="flex items-center gap-2.5">
+                            <div className="min-w-[72px] flex-1">
+                              <StatBar value={row.score} />
+                            </div>
+                            <span className="min-w-7 text-[12px] text-[#615c53]">
+                              {row.score}
+                            </span>
                           </div>
-                          <ScorePill label={item.badge} />
+                        </TableCell>
+                        <TableCell className="py-1 text-right">
+                          <ScorePill label={row.badge} />
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </CardContent>
+              <CardFooter className={CARD_FOOTER}>
+                <CardLink
+                  label="Lihat analisis lengkap"
+                  to="/kesesuaian-lahan"
+                />
+              </CardFooter>
+            </Card>
+
+            <Card className="flex h-full min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+              <SectionTitle
+                title="Prediksi Harga Komoditas"
+                trailing={
+                  <CircleHelp className="mt-0.5 size-4 text-[#968d80]" />
+                }
+              />
+              <CardContent className={`${CARD_CONTENT} space-y-3`}>
+                <Select defaultValue="semua">
+                  <SelectTrigger className="h-8 w-[145px] rounded-xl border-[#e5dacb] bg-[#fffdf8] text-[11px] shadow-none">
+                    <SelectValue placeholder="Semua Komoditas" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      <SelectItem value="semua">Semua Komoditas</SelectItem>
+                      <SelectItem value="padi">Padi</SelectItem>
+                      <SelectItem value="jagung">Jagung</SelectItem>
+                      <SelectItem value="cabai">Cabai Merah</SelectItem>
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+                <ForecastChart />
+              </CardContent>
+              <CardFooter className={CARD_FOOTER}>
+                <CardLink label="Lihat detail & data" to="/prediksi-harga" />
+              </CardFooter>
+            </Card>
+          </div>
+
+          <div className="grid items-stretch gap-2.5 xl:grid-cols-[1.02fr_0.98fr]">
+            <Card className="flex h-full min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+              <SectionTitle
+                title="Peta Wilayah & Lahan"
+                description="Kab. Jombang, Jawa Timur"
+                trailing={
+                  <CircleHelp className="mt-0.5 size-4 text-[#968d80]" />
+                }
+              />
+              <CardContent className={CARD_CONTENT}>
+                <MapPreview />
+              </CardContent>
+              <CardFooter className={CARD_FOOTER}>
+                <CardLink label="Buka peta interaktif" to="/peta-wilayah" />
+              </CardFooter>
+            </Card>
+
+            <Card className="flex h-full min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+              <SectionTitle
+                title="Rekomendasi Tanam"
+                trailing={
+                  <CircleHelp className="mt-0.5 size-4 text-[#968d80]" />
+                }
+              />
+              <CardContent className={CARD_CONTENT}>
+                <div className="space-y-2">
+                  {recommendations.map((item, index) => {
+                    const toneColor =
+                      item.badge === "Sangat Sesuai"
+                        ? "#5c9a59"
+                        : item.badge === "Sesuai"
+                          ? "#efb33d"
+                          : "#df7b65"
+
+                    return (
+                      <div
+                        key={item.title}
+                        className="grid grid-cols-[18px_1fr] items-center gap-2"
+                      >
+                        <div className="relative flex h-full min-h-[74px] items-center justify-center">
+                          {index < recommendations.length - 1 ? (
+                            <span className="absolute left-1/2 top-1/2 h-[calc(100%+0.5rem)] w-px -translate-x-1/2 bg-[#dccfbf]" />
+                          ) : null}
+                          <span
+                            className="relative z-10 size-4 rounded-full border-[3px] bg-white"
+                            style={{ borderColor: toneColor }}
+                          />
                         </div>
-                        <p className="text-[9px] leading-3 text-[#6d6559]">
-                          {item.body}
-                        </p>
+                        <div className="rounded-[14px] border border-[#efe4d3] bg-[#fffdf9] px-3 py-1.5">
+                          <div className="mb-0.5 flex items-start justify-between gap-2">
+                            <div>
+                              <p className="text-[10px] text-[#8d8478]">
+                                {item.date}
+                              </p>
+                              <p className="mt-0.5 text-[12px] font-semibold text-[#2f3f2f]">
+                                {item.title}
+                              </p>
+                            </div>
+                            <ScorePill label={item.badge} />
+                          </div>
+                          <p className="text-[9px] leading-3 text-[#6d6559]">
+                            {item.body}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </CardContent>
-            <CardFooter className={CARD_FOOTER}>
-              <CardLink label="Lihat kalender tanam lengkap" />
-            </CardFooter>
-          </Card>
+                    )
+                  })}
+                </div>
+              </CardContent>
+              <CardFooter className={CARD_FOOTER}>
+                <CardLink
+                  label="Lihat kalender tanam lengkap"
+                  to="/rekomendasi-tanam"
+                />
+              </CardFooter>
+            </Card>
+          </div>
         </div>
-      </div>
 
         <div className="grid gap-3">
           <Button className="h-10 justify-self-end rounded-xl bg-[#215b39] px-4 text-sm text-white shadow-sm hover:bg-[#1a4a2f] lg:hidden">
@@ -623,107 +646,107 @@ export function TaniLinkDashboard() {
             <span>Ekspor Laporan</span>
           </Button>
 
-        <Card className="flex min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-[1.08]">
-          <SectionTitle
-            title="Cuaca Saat Ini"
-            description="Jombang, Jawa Timur"
-          />
-          <CardContent className={`${CARD_CONTENT} space-y-3`}>
-            <div className="grid grid-cols-[auto_1fr] gap-2">
-              <div className="flex size-8.5 items-center justify-center rounded-full bg-[#fff4df]">
-                <CloudSun className="size-4.5 text-[#d79328]" />
-              </div>
-              <div className="grid grid-cols-[1fr_auto] gap-2">
-                <div>
-                  <div className="font-[Fraunces] text-[1.9rem] leading-none text-[#23392d]">
-                    27°C
-                  </div>
-                  <p className="mt-0.5 text-[12px] text-[#666156]">
-                    Cerah Berawan
-                  </p>
-                  <p className="text-[10px] text-[#8b8173]">
-                    Terasa seperti 31°C
-                  </p>
+          <Card className="flex min-h-[228px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-[1.08]">
+            <SectionTitle
+              title="Cuaca Saat Ini"
+              description="Jombang, Jawa Timur"
+            />
+            <CardContent className={`${CARD_CONTENT} space-y-3`}>
+              <div className="grid grid-cols-[auto_1fr] gap-2">
+                <div className="flex size-8.5 items-center justify-center rounded-full bg-[#fff4df]">
+                  <CloudSun className="size-4.5 text-[#d79328]" />
                 </div>
-                <div className="space-y-0.5 text-[9px] text-[#615c53]">
-                  <div className="flex items-center gap-1.5">
-                    <Droplets className="size-3 text-[#2d7451]" />
-                    <span>Kelembapan</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <Wind className="size-3 text-[#2d7451]" />
-                    <span>Angin</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <CloudRain className="size-3 text-[#2d7451]" />
-                    <span>Curah Hujan</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <SunMedium className="size-3 text-[#de8a1c]" />
-                    <span>UV Index</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <Separator className="bg-[#eee4d5]" />
-            <div className="grid grid-cols-5 gap-0.5">
-              {weeklyWeather.map((day) => {
-                const Icon = day.icon
-                return (
-                  <div key={day.day} className="space-y-1 text-center">
-                    <p className="text-[9px] text-[#6a6458]">{day.day}</p>
-                    <Icon className="mx-auto size-4 text-[#d79328]" />
-                    <p className="text-[9px] leading-3.5 text-[#6a6458]">
-                      {day.high} / {day.low}
+                <div className="grid grid-cols-[1fr_auto] gap-2">
+                  <div>
+                    <div className="font-[Fraunces] text-[1.9rem] leading-none text-[#23392d]">
+                      27°C
+                    </div>
+                    <p className="mt-0.5 text-[12px] text-[#666156]">
+                      Cerah Berawan
+                    </p>
+                    <p className="text-[10px] text-[#8b8173]">
+                      Terasa seperti 31°C
                     </p>
                   </div>
-                )
-              })}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="flex min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-1">
-          <SectionTitle
-            title="Kondisi Tanah"
-            description="Lokasi Anda"
-            trailing={
-              <div className="flex items-center gap-1.5 text-[10px] text-[#9a907f]">
-                <CircleHelp className="size-3.5" />
-                <span>18 Mei 2025</span>
-              </div>
-            }
-          />
-          <CardContent className={CARD_CONTENT}>
-            <div className="grid grid-cols-3 gap-px overflow-hidden rounded-[14px] border border-[#efe4d3] bg-[#efe4d3]">
-              {soilStats.map((item) => (
-                <div key={item.label} className="bg-[#fffdfa] p-1.5">
-                  <div className="mb-1 flex items-center gap-1.5 text-[8px] text-[#6c665b]">
-                    <span className="flex size-4 items-center justify-center rounded-full bg-[#f0f5eb] text-[#2d6d45]">
-                      <Leaf className="size-2.5" />
-                    </span>
-                    <span>{item.label}</span>
+                  <div className="space-y-0.5 text-[9px] text-[#615c53]">
+                    <div className="flex items-center gap-1.5">
+                      <Droplets className="size-3 text-[#2d7451]" />
+                      <span>Kelembapan</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Wind className="size-3 text-[#2d7451]" />
+                      <span>Angin</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <CloudRain className="size-3 text-[#2d7451]" />
+                      <span>Curah Hujan</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <SunMedium className="size-3 text-[#de8a1c]" />
+                      <span>UV Index</span>
+                    </div>
                   </div>
-                  <p className="font-[Fraunces] text-[1.1rem] leading-none text-[#23392d]">
-                    {item.value}
-                  </p>
-                  <p className="mt-0.5 text-[8px] text-[#8b8173]">
-                    {item.note}
-                  </p>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              </div>
+              <Separator className="bg-[#eee4d5]" />
+              <div className="grid grid-cols-5 gap-0.5">
+                {weeklyWeather.map((day) => {
+                  const Icon = day.icon
+                  return (
+                    <div key={day.day} className="space-y-1 text-center">
+                      <p className="text-[9px] text-[#6a6458]">{day.day}</p>
+                      <Icon className="mx-auto size-4 text-[#d79328]" />
+                      <p className="text-[9px] leading-3.5 text-[#6a6458]">
+                        {day.high} / {day.low}
+                      </p>
+                    </div>
+                  )
+                })}
+              </div>
+            </CardContent>
+          </Card>
 
-        <Card className="flex min-h-[148px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-[0.92]">
-          <SectionTitle title="Peringatan & Informasi" />
-          <CardContent className={`${CARD_CONTENT} space-y-1.5`}>
-            {notifications.map((item) => (
-              <NotificationAlert key={item.title} {...item} />
-            ))}
-          </CardContent>
-        </Card>
+          <Card className="flex min-h-[184px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-1">
+            <SectionTitle
+              title="Kondisi Tanah"
+              description="Lokasi Anda"
+              trailing={
+                <div className="flex items-center gap-1.5 text-[10px] text-[#9a907f]">
+                  <CircleHelp className="size-3.5" />
+                  <span>18 Mei 2025</span>
+                </div>
+              }
+            />
+            <CardContent className={CARD_CONTENT}>
+              <div className="grid grid-cols-3 gap-px overflow-hidden rounded-[14px] border border-[#efe4d3] bg-[#efe4d3]">
+                {soilStats.map((item) => (
+                  <div key={item.label} className="bg-[#fffdfa] p-1.5">
+                    <div className="mb-1 flex items-center gap-1.5 text-[8px] text-[#6c665b]">
+                      <span className="flex size-4 items-center justify-center rounded-full bg-[#f0f5eb] text-[#2d6d45]">
+                        <Leaf className="size-2.5" />
+                      </span>
+                      <span>{item.label}</span>
+                    </div>
+                    <p className="font-[Fraunces] text-[1.1rem] leading-none text-[#23392d]">
+                      {item.value}
+                    </p>
+                    <p className="mt-0.5 text-[8px] text-[#8b8173]">
+                      {item.note}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="flex min-h-[148px] flex-col rounded-[20px] border-[#eadfcf] bg-white shadow-sm xl:min-h-0 xl:flex-[0.92]">
+            <SectionTitle title="Peringatan & Informasi" />
+            <CardContent className={`${CARD_CONTENT} space-y-1.5`}>
+              {notifications.map((item) => (
+                <NotificationAlert key={item.title} {...item} />
+              ))}
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>

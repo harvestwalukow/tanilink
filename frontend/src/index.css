@@ -43,6 +43,7 @@
 }
 
 :root {
+  --removed-body-scroll-bar-size: 0px;
   --radius: 0.625rem;
   --background: #f7f0e3;
   --foreground: #163127;
@@ -130,10 +131,13 @@
       ),
       linear-gradient(180deg, #fffdf7 0%, #f7f0e3 100%);
   }
-  body[data-scroll-locked] {
-    margin-right: 0 !important;
-    padding-right: 0 !important;
+  html[data-scroll-locked],
+  body[data-scroll-locked],
+  html[style*="overflow: hidden"] {
+    margin-right: 0;
+    padding-right: 0;
   }
+
   button,
   [role="button"] {
     cursor: pointer;
