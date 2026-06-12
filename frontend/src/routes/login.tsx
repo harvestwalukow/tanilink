@@ -20,7 +20,8 @@ import {
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
-import useAuth, { isLoggedIn } from "@/hooks/useAuth"
+import { APP_HOME_PATH, isLoggedIn } from "@/hooks/useAuth"
+import useAuth from "@/hooks/useAuth"
 
 const formSchema = z.object({
   username: z.email(),
@@ -37,14 +38,14 @@ export const Route = createFileRoute("/login")({
   beforeLoad: async () => {
     if (isLoggedIn()) {
       throw redirect({
-        to: "/",
+        to: APP_HOME_PATH,
       })
     }
   },
   head: () => ({
     meta: [
       {
-        title: "Log In - FastAPI Template",
+        title: "Masuk - TaniLink",
       },
     ],
   }),
@@ -74,8 +75,10 @@ function Login() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-6"
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Login to your account</h1>
+          <div className="flex flex-col gap-2 text-left">
+            <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#17352b]">
+              Masuk ke akun Anda
+            </h1>
           </div>
 
           <div className="grid gap-4">
@@ -104,35 +107,42 @@ function Login() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center">
-                    <FormLabel>Password</FormLabel>
-                    <RouterLink
-                      to="/recover-password"
-                      className="ml-auto text-sm underline-offset-4 hover:underline"
-                    >
-                      Forgot your password?
-                    </RouterLink>
-                  </div>
-                  <FormControl>
-                    <PasswordInput
-                      data-testid="password-input"
-                      placeholder="Password"
-                      {...field}
-                    />
-                  </FormControl>
+                  <FormLabel>Kata sandi</FormLabel>
+                  <RouterLink
+                    to="/recover-password"
+                    className="ml-auto text-sm text-[#5f685b] underline-offset-4 hover:text-[#17352b] hover:underline"
+                  >
+                    Lupa kata sandi?
+                  </RouterLink>
+                </div>
+                <FormControl>
+                  <PasswordInput
+                    data-testid="password-input"
+                    placeholder="Masukkan kata sandi"
+                    {...field}
+                  />
+                </FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
 
-            <LoadingButton type="submit" loading={loginMutation.isPending}>
-              Log In
+            <LoadingButton
+              type="submit"
+              loading={loginMutation.isPending}
+              className="h-11 rounded-full bg-[#24473b] text-[#fffaf2] hover:bg-[#17352b]"
+            >
+              Masuk
             </LoadingButton>
           </div>
 
-          <div className="text-center text-sm">
-            Don't have an account yet?{" "}
-            <RouterLink to="/signup" className="underline underline-offset-4">
-              Sign up
+          <div className="text-center text-sm text-[#6c655a]">
+            Belum punya akun?{" "}
+            <RouterLink
+              to="/signup"
+              className="font-medium text-[#17352b] underline underline-offset-4"
+            >
+              Daftar
             </RouterLink>
           </div>
         </form>

@@ -380,16 +380,16 @@ function KesesuaianLahan() {
                 setCurrentPage(1)
               }}
             >
-              <SelectTrigger className="h-10 w-[160px] rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs shadow-none">
+              <SelectTrigger className="h-10 w-[160px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
                 <SelectValue placeholder="Pilih Kelas" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
                 <SelectGroup>
-                  <SelectItem value="all">Semua Kelas</SelectItem>
-                  <SelectItem value="Sangat Sesuai">Sangat Sesuai</SelectItem>
-                  <SelectItem value="Sesuai">Sesuai</SelectItem>
-                  <SelectItem value="Cukup Sesuai">Cukup Sesuai</SelectItem>
-                  <SelectItem value="Tidak Sesuai">Tidak Sesuai</SelectItem>
+                  <SelectItem value="all" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Semua Kelas</SelectItem>
+                  <SelectItem value="Sangat Sesuai" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Sangat Sesuai</SelectItem>
+                  <SelectItem value="Sesuai" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Sesuai</SelectItem>
+                  <SelectItem value="Cukup Sesuai" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Cukup Sesuai</SelectItem>
+                  <SelectItem value="Tidak Sesuai" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Tidak Sesuai</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -402,15 +402,15 @@ function KesesuaianLahan() {
                 setCurrentPage(1)
               }}
             >
-              <SelectTrigger className="h-10 w-[180px] rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs shadow-none">
+              <SelectTrigger className="h-10 w-[180px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
                 <SelectValue placeholder="Urutkan" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
                 <SelectGroup>
-                  <SelectItem value="skor-desc">Skor Tertinggi</SelectItem>
-                  <SelectItem value="skor-asc">Skor Terendah</SelectItem>
-                  <SelectItem value="name-asc">Nama A - Z</SelectItem>
-                  <SelectItem value="name-desc">Nama Z - A</SelectItem>
+                  <SelectItem value="skor-desc" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Skor Tertinggi</SelectItem>
+                  <SelectItem value="skor-asc" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Skor Terendah</SelectItem>
+                  <SelectItem value="name-asc" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Nama A - Z</SelectItem>
+                  <SelectItem value="name-desc" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Nama Z - A</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

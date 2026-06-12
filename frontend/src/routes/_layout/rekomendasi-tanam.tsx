@@ -278,17 +278,17 @@ function RekomendasiTanam() {
               value={selectedCommodity}
               onValueChange={setSelectedCommodity}
             >
-              <SelectTrigger className="h-10 w-[180px] rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs shadow-none">
+              <SelectTrigger className="h-10 w-[180px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
                 <SelectValue placeholder="Pilih Komoditas" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
                 <SelectGroup>
-                  <SelectItem value="all">Semua Komoditas</SelectItem>
-                  <SelectItem value="Padi Sawah">Padi Sawah</SelectItem>
-                  <SelectItem value="Jagung">Jagung</SelectItem>
-                  <SelectItem value="Cabai Merah">Cabai Merah</SelectItem>
-                  <SelectItem value="Bawang Merah">Bawang Merah</SelectItem>
-                  <SelectItem value="Tebu">Tebu</SelectItem>
+                  <SelectItem value="all" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Semua Komoditas</SelectItem>
+                  <SelectItem value="Padi Sawah" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Padi Sawah</SelectItem>
+                  <SelectItem value="Jagung" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Jagung</SelectItem>
+                  <SelectItem value="Cabai Merah" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Cabai Merah</SelectItem>
+                  <SelectItem value="Bawang Merah" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Bawang Merah</SelectItem>
+                  <SelectItem value="Tebu" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Tebu</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

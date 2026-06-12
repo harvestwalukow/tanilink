@@ -18,7 +18,7 @@ import {
 import { type Item, Main } from "./Main"
 
 const baseItems: Item[] = [
-  { icon: Home, title: "Beranda", path: "/" },
+  { icon: Home, title: "Beranda", path: "/app" },
   { icon: Sprout, title: "Kesesuaian Lahan", path: "/kesesuaian-lahan" },
   { icon: BarChart3, title: "Prediksi Harga", path: "/prediksi-harga" },
   { icon: Landmark, title: "Rekomendasi Tanam", path: "/rekomendasi-tanam" },
@@ -30,9 +30,12 @@ export function AppSidebar() {
   const items = baseItems
 
   return (
-    <Sidebar collapsible="icon" className="border-r-0">
+    <Sidebar
+      collapsible="icon"
+      className="border-r-0 shadow-[inset_-1px_0_0_rgba(255,255,255,0.04)]"
+    >
       <SidebarHeader className="px-4 py-6 group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:items-center">
-        <Logo variant="responsive" />
+        <Logo variant="responsive" to="/app" />
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup className="px-3 group-data-[collapsible=icon]:px-1.5">

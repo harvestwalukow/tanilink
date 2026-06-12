@@ -118,22 +118,77 @@
   }
   html {
     font-family: "Manrope", sans-serif;
+    background-color: #f7f0e3;
   }
   body {
     @apply bg-background text-foreground;
-    background-image:
-      radial-gradient(
-        circle at top left,
-        rgba(255, 255, 255, 0.5),
-        transparent 22%
-      ),
-      linear-gradient(180deg, #fffdf7 0%, #f7f0e3 100%);
+    background-color: #f7f0e3;
+    background-image: none;
   }
 
   button,
   [role="button"] {
     cursor: pointer;
   }
+}
+
+.app-shell {
+  --background: #f7f0e3;
+  --foreground: #163127;
+  --card: #fffdf7;
+  --card-foreground: #163127;
+  --popover: #fffdf7;
+  --popover-foreground: #163127;
+  --primary: #24473b;
+  --primary-foreground: #fffdf7;
+  --secondary: #f3ead8;
+  --secondary-foreground: #3b3b34;
+  --muted: #f8f2e7;
+  --muted-foreground: #6c655a;
+  --accent: #e5efe9;
+  --accent-foreground: #163127;
+  --border: #e2d7c7;
+  --input: #eadfcd;
+  --ring: #2f5d50;
+  --chart-1: #c98a4b;
+  --chart-2: #24473b;
+  --chart-3: #6c8f41;
+  --chart-4: #d9ae67;
+  --chart-5: #7a6650;
+  --sidebar: #24473b;
+  --sidebar-foreground: #f8f4ea;
+  --sidebar-primary: #fff6e4;
+  --sidebar-primary-foreground: #163127;
+  --sidebar-accent: #315d4e;
+  --sidebar-accent-foreground: #f8f4ea;
+  --sidebar-border: rgba(255, 255, 255, 0.08);
+  --sidebar-ring: #d7ccb9;
+}
+
+.public-shell,
+.auth-shell {
+  --background: #f7f0e3;
+  --foreground: #163127;
+  --card: #fffdf7;
+  --card-foreground: #163127;
+  --popover: #fffdf7;
+  --popover-foreground: #163127;
+  --primary: #24473b;
+  --primary-foreground: #fffdf7;
+  --secondary: #f3ead8;
+  --secondary-foreground: #3b3b34;
+  --muted: #f8f2e7;
+  --muted-foreground: #6c655a;
+  --accent: #e5efe9;
+  --accent-foreground: #163127;
+  --border: #e2d7c7;
+  --input: #eadfcd;
+  --ring: #2f5d50;
+  --chart-1: #c98a4b;
+  --chart-2: #24473b;
+  --chart-3: #6c8f41;
+  --chart-4: #d9ae67;
+  --chart-5: #7a6650;
 }
 
 /* Keep the scrollbar always visible to prevent scrollbar disappearance and track shifts */
@@ -147,6 +202,53 @@ body[data-scroll-locked],
 html[style*="overflow: hidden"],
 body[style*="overflow: hidden"],
 [data-scroll-locked],
+html[data-scroll-locked],
+body[data-scroll-locked] {
+  background-color: #f7f0e3;
+}
+
+html body[data-scroll-locked],
+body[data-scroll-locked][data-scroll-locked] {
+  margin-right: 0 !important;
+  padding-right: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+  overflow: hidden !important;
+  --removed-body-scroll-bar-size: 0px !important;
+}
+
+html .right-scroll-bar-position,
+body .right-scroll-bar-position {
+  right: 0 !important;
+}
+
+html .width-before-scroll-bar,
+body .width-before-scroll-bar {
+  margin-right: 0 !important;
+  width: auto !important;
+  max-width: none !important;
+}
+
+html .with-scroll-bars-hidden,
+body .with-scroll-bars-hidden {
+  padding-right: 0 !important;
+}
+
+html[data-scroll-locked] [style*="padding-right"],
+html[style*="overflow: hidden"] [style*="padding-right"],
+body[style*="overflow: hidden"] [style*="padding-right"],
+html[data-scroll-locked] [style*="margin-right"],
+html[style*="overflow: hidden"] [style*="margin-right"],
+body[style*="overflow: hidden"] [style*="margin-right"],
+html[data-scroll-locked] body,
+html[style*="overflow: hidden"] body,
+html[data-scroll-locked] header,
+html[style*="overflow: hidden"] header,
+html[data-scroll-locked] [data-sidebar],
+html[style*="overflow: hidden"] [data-sidebar] {
+  background-color: #f7f0e3;
+}
+
 html[data-scroll-locked] [style*="padding-right"],
 html[style*="overflow: hidden"] [style*="padding-right"],
 body[style*="overflow: hidden"] [style*="padding-right"],

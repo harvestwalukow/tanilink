@@ -256,17 +256,17 @@ function PrediksiHarga() {
                 setSelectedCommodity(val as "all" | CommodityKey)
               }
             >
-              <SelectTrigger className="h-10 w-[180px] rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs shadow-none">
+              <SelectTrigger className="h-10 w-[180px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
                 <SelectValue placeholder="Pilih Komoditas" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
                 <SelectGroup>
-                  <SelectItem value="all">Semua Komoditas</SelectItem>
-                  <SelectItem value="padi">Padi Sawah</SelectItem>
-                  <SelectItem value="jagung">Jagung</SelectItem>
-                  <SelectItem value="cabai">Cabai Merah</SelectItem>
-                  <SelectItem value="bawang">Bawang Merah</SelectItem>
-                  <SelectItem value="tebu">Tebu</SelectItem>
+                  <SelectItem value="all" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Semua Komoditas</SelectItem>
+                  <SelectItem value="padi" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Padi Sawah</SelectItem>
+                  <SelectItem value="jagung" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Jagung</SelectItem>
+                  <SelectItem value="cabai" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Cabai Merah</SelectItem>
+                  <SelectItem value="bawang" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Bawang Merah</SelectItem>
+                  <SelectItem value="tebu" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Tebu</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>
@@ -276,14 +276,14 @@ function PrediksiHarga() {
               value={String(rangeDays)}
               onValueChange={(val) => setRangeDays(Number(val) as 30 | 60 | 90)}
             >
-              <SelectTrigger className="h-10 w-[140px] rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs shadow-none">
+              <SelectTrigger className="h-10 w-[140px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
                 <SelectValue placeholder="Jangka Waktu" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
                 <SelectGroup>
-                  <SelectItem value="30">30 Hari</SelectItem>
-                  <SelectItem value="60">60 Hari</SelectItem>
-                  <SelectItem value="90">90 Hari</SelectItem>
+                  <SelectItem value="30" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">30 Hari</SelectItem>
+                  <SelectItem value="60" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">60 Hari</SelectItem>
+                  <SelectItem value="90" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">90 Hari</SelectItem>
                 </SelectGroup>
               </SelectContent>
             </Select>

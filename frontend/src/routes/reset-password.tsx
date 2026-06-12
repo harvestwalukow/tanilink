@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/form"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
-import { isLoggedIn } from "@/hooks/useAuth"
+import { APP_HOME_PATH, isLoggedIn } from "@/hooks/useAuth"
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
 
@@ -51,7 +51,7 @@ export const Route = createFileRoute("/reset-password")({
   validateSearch: searchSchema,
   beforeLoad: async ({ search }) => {
     if (isLoggedIn()) {
-      throw redirect({ to: "/" })
+      throw redirect({ to: APP_HOME_PATH })
     }
     if (!search.token) {
       throw redirect({ to: "/login" })

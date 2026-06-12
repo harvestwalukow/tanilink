@@ -18,7 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
 import { PasswordInput } from "@/components/ui/password-input"
-import useAuth, { isLoggedIn } from "@/hooks/useAuth"
+import useAuth, { APP_HOME_PATH, isLoggedIn } from "@/hooks/useAuth"
 
 const formSchema = z
   .object({
@@ -44,14 +44,14 @@ export const Route = createFileRoute("/signup")({
   beforeLoad: async () => {
     if (isLoggedIn()) {
       throw redirect({
-        to: "/",
+        to: APP_HOME_PATH,
       })
     }
   },
   head: () => ({
     meta: [
       {
-        title: "Sign Up - FastAPI Template",
+        title: "Daftar - TaniLink",
       },
     ],
   }),
@@ -86,8 +86,10 @@ function SignUp() {
           onSubmit={form.handleSubmit(onSubmit)}
           className="flex flex-col gap-6"
         >
-          <div className="flex flex-col items-center gap-2 text-center">
-            <h1 className="text-2xl font-bold">Create an account</h1>
+          <div className="flex flex-col gap-2 text-left">
+            <h1 className="text-3xl font-semibold tracking-[-0.03em] text-[#17352b]">
+              Buat akun Anda
+            </h1>
           </div>
 
           <div className="grid gap-4">
@@ -96,16 +98,16 @@ function SignUp() {
               name="full_name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Full Name</FormLabel>
+                  <FormLabel>Nama lengkap</FormLabel>
                   <FormControl>
                     <Input
                       data-testid="full-name-input"
-                      placeholder="User"
+                      placeholder="Nama Anda"
                       type="text"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
@@ -124,7 +126,7 @@ function SignUp() {
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
@@ -134,15 +136,15 @@ function SignUp() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Password</FormLabel>
+                  <FormLabel>Kata sandi</FormLabel>
                   <FormControl>
                     <PasswordInput
                       data-testid="password-input"
-                      placeholder="Password"
+                      placeholder="Masukkan kata sandi"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
@@ -152,32 +154,35 @@ function SignUp() {
               name="confirm_password"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Confirm Password</FormLabel>
+                  <FormLabel>Konfirmasi kata sandi</FormLabel>
                   <FormControl>
                     <PasswordInput
                       data-testid="confirm-password-input"
-                      placeholder="Confirm Password"
+                      placeholder="Ulangi kata sandi"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-xs" />
                 </FormItem>
               )}
             />
 
             <LoadingButton
               type="submit"
-              className="w-full"
+              className="h-11 w-full rounded-full bg-[#24473b] text-[#fffaf2] hover:bg-[#17352b]"
               loading={signUpMutation.isPending}
             >
-              Sign Up
+              Daftar
             </LoadingButton>
           </div>
 
-          <div className="text-center text-sm">
-            Already have an account?{" "}
-            <RouterLink to="/login" className="underline underline-offset-4">
-              Log in
+          <div className="text-center text-sm text-[#6c655a]">
+            Sudah punya akun?{" "}
+            <RouterLink
+              to="/login"
+              className="font-medium text-[#17352b] underline underline-offset-4"
+            >
+              Masuk
             </RouterLink>
           </div>
         </form>

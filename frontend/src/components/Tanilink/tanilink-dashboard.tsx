@@ -523,7 +523,7 @@ export function TaniLinkDashboard() {
             Ringkasan kondisi pertanian di Kab. Jombang, Jawa Timur
           </p>
         </div>
-        <Button className="hidden h-10 shrink-0 items-center gap-2 rounded-xl bg-primary px-4.5 text-sm text-white shadow-sm hover:bg-[#24473b] lg:inline-flex">
+        <Button className="hidden h-10 shrink-0 items-center gap-2 rounded-xl bg-[#24473b] px-4.5 text-sm text-white shadow-sm hover:bg-[#17352b] lg:inline-flex">
           <Download className="size-4" />
           <span>Ekspor Laporan</span>
         </Button>
@@ -682,17 +682,17 @@ export function TaniLinkDashboard() {
               />
               <CardContent className={`${CARD_CONTENT} space-y-3`}>
                 <Select value={selectedComm} onValueChange={setSelectedComm}>
-                  <SelectTrigger className="h-8 w-[145px] rounded-xl border-[#e5dacb] bg-[#fffdf8] text-[11px] shadow-none">
+                  <SelectTrigger className="h-8 w-[145px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-[11px] text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
                     <SelectValue placeholder="Semua Komoditas" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
                     <SelectGroup>
-                      <SelectItem value="semua">Semua Komoditas</SelectItem>
-                      <SelectItem value="padi">Padi</SelectItem>
-                      <SelectItem value="jagung">Jagung</SelectItem>
-                      <SelectItem value="cabai">Cabai Merah</SelectItem>
-                      <SelectItem value="bawang">Bawang Merah</SelectItem>
-                      <SelectItem value="tebu">Tebu</SelectItem>
+                      <SelectItem value="semua" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Semua Komoditas</SelectItem>
+                      <SelectItem value="padi" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Padi</SelectItem>
+                      <SelectItem value="jagung" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Jagung</SelectItem>
+                      <SelectItem value="cabai" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Cabai Merah</SelectItem>
+                      <SelectItem value="bawang" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Bawang Merah</SelectItem>
+                      <SelectItem value="tebu" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Tebu</SelectItem>
                     </SelectGroup>
                   </SelectContent>
                 </Select>
@@ -784,7 +784,7 @@ export function TaniLinkDashboard() {
         </div>
 
         <div className="grid gap-3">
-          <Button className="h-10 justify-self-end rounded-xl bg-primary px-4 text-sm text-white shadow-sm hover:bg-[#24473b] lg:hidden">
+          <Button className="h-10 justify-self-end rounded-xl bg-[#24473b] px-4 text-sm text-white shadow-sm hover:bg-[#17352b] lg:hidden">
             <Download className="size-4" />
             <span>Ekspor Laporan</span>
           </Button>

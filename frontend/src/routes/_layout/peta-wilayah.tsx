@@ -285,16 +285,16 @@ function PetaWilayah() {
               Overlay Peta:
             </span>
             <Select value={selectedLayer} onValueChange={setSelectedLayer}>
-              <SelectTrigger className="h-10 w-[220px] rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs shadow-none">
+              <SelectTrigger className="h-10 w-[220px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
                 <SelectValue placeholder="Pilih Layer" />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
                 <SelectGroup>
-                  <SelectItem value="kesesuaian-padi">
+                  <SelectItem value="kesesuaian-padi" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">
                     Kesesuaian Padi Sawah
                   </SelectItem>
-                  <SelectItem value="ph-tanah">Kandungan pH Tanah</SelectItem>
-                  <SelectItem value="curah-hujan">
+                  <SelectItem value="ph-tanah" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Kandungan pH Tanah</SelectItem>
+                  <SelectItem value="curah-hujan" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">
                     Indeks Curah Hujan
                   </SelectItem>
                 </SelectGroup>

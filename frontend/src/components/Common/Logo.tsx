@@ -6,16 +6,25 @@ interface LogoProps {
   variant?: "full" | "icon" | "responsive"
   className?: string
   asLink?: boolean
+  tone?: "light" | "dark"
+  to?: "/" | "/app"
 }
 
 export function Logo({
   variant = "full",
   className,
   asLink = true,
+  tone = "light",
+  to = "/",
 }: LogoProps) {
   const wordmark = (
     <div className={cn("flex flex-col", className)}>
-      <span className="font-[Fraunces] text-[1.6rem] leading-none tracking-[-0.04em] text-[#f7f2e8]">
+      <span
+        className={cn(
+          'font-[Fraunces] text-[1.6rem] leading-none tracking-[-0.04em]',
+          tone === "light" ? "text-[#f7f2e8]" : "text-[#24473b]",
+        )}
+      >
         TaniLink
       </span>
     </div>
@@ -34,5 +43,5 @@ export function Logo({
     return content
   }
 
-  return <Link to="/">{content}</Link>
+  return <Link to={to}>{content}</Link>
 }

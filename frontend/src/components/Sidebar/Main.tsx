@@ -44,7 +44,7 @@ export function Main({ items }: MainProps) {
                   tooltip={item.title}
                   isActive={isActive}
                   size="lg"
-                  className="justify-start gap-3 rounded-xl bg-transparent px-4 text-sm font-medium shadow-none group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:[&>span]:hidden"
+                  className="justify-start gap-3 rounded-xl bg-transparent px-4 text-sm font-medium text-[#edf3ea] shadow-none hover:text-white data-[active=true]:bg-[#315d4e] data-[active=true]:text-white group-data-[collapsible=icon]:size-10! group-data-[collapsible=icon]:justify-center group-data-[collapsible=icon]:rounded-xl group-data-[collapsible=icon]:px-0 group-data-[collapsible=icon]:[&>span]:hidden"
                   asChild
                 >
                   <RouterLink to={item.path} onClick={handleMenuClick}>

@@ -20,7 +20,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { LoadingButton } from "@/components/ui/loading-button"
-import { isLoggedIn } from "@/hooks/useAuth"
+import { APP_HOME_PATH, isLoggedIn } from "@/hooks/useAuth"
 import useCustomToast from "@/hooks/useCustomToast"
 import { handleError } from "@/utils"
 
@@ -35,7 +35,7 @@ export const Route = createFileRoute("/recover-password")({
   beforeLoad: async () => {
     if (isLoggedIn()) {
       throw redirect({
-        to: "/",
+        to: APP_HOME_PATH,
       })
     }
   },
