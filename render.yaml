@@ -1,0 +1,79 @@
+databases:
+  - name: tanilink-db
+    databaseName: app
+    user: postgres
+    plan: free
+
+services:
+  - type: web
+    name: tanilink-api
+    runtime: docker
+    plan: free
+    dockerfilePath: ./backend/Dockerfile
+    dockerContext: .
+    autoDeploy: true
+    healthCheckPath: /api/v1/utils/health-check/
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: PROJECT_NAME
+        value: Tanilink
+      - key: DOMAIN
+        value: tanilink-api.onrender.com
+      - key: FRONTEND_HOST
+        value: https://tanilink-web.onrender.com
+      - key: BACKEND_CORS_ORIGINS
+        value: https://tanilink-web.onrender.com
+      - key: SECRET_KEY
+        generateValue: true
+      - key: FIRST_SUPERUSER
+        value: admin@example.com
+      - key: FIRST_SUPERUSER_PASSWORD
+        generateValue: true
+      - key: EMAILS_FROM_EMAIL
+        value: noreply@example.com
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASSWORD
+        sync: false
+      - key: SMTP_TLS
+        value: false
+      - key: SMTP_SSL
+        value: false
+      - key: SMTP_PORT
+        value: "1025"
+      - key: POSTGRES_SERVER
+        fromDatabase:
+          name: tanilink-db
+          property: host
+      - key: POSTGRES_PORT
+        fromDatabase:
+          name: tanilink-db
+          property: port
+      - key: POSTGRES_DB
+        fromDatabase:
+          name: tanilink-db
+          property: database
+      - key: POSTGRES_USER
+        fromDatabase:
+          name: tanilink-db
+          property: user
+      - key: POSTGRES_PASSWORD
+        fromDatabase:
+          name: tanilink-db
+          property: password
+      - key: SENTRY_DSN
+        sync: false
+
+  - type: web
+    name: tanilink-web
+    runtime: docker
+    plan: free
+    dockerfilePath: ./frontend/Dockerfile
+    dockerContext: .
+    autoDeploy: true
+    envVars:
+      - key: VITE_API_URL
+        value: https://tanilink-api.onrender.com
