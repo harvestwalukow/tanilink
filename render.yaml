@@ -1,7 +1,6 @@
 databases:
   - name: tanilink-db
     databaseName: app
-    user: postgres
     plan: free
 
 services:

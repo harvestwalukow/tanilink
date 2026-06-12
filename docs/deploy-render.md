@@ -8,6 +8,8 @@ This repo can be deployed to Render with:
 
 The configuration is already prepared in [render.yaml](/D:/CODE/tanilink/render.yaml).
 
+Note: the Blueprint does not hardcode a database username. Render will create the database user automatically and inject it into the backend via `fromDatabase`.
+
 ## What gets created
 
 - `tanilink-db`
