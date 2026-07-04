@@ -1,10 +1,7 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
 import {
-  Bell,
   Calendar as CalendarIcon,
   ChevronDown,
-  CircleHelp,
-  Crosshair,
   LocateFixed,
   MapPin,
   Search,
@@ -15,7 +12,6 @@ import { Footer } from "@/components/Common/Footer"
 import AppSidebar from "@/components/Sidebar/AppSidebar"
 import { isLoggedIn } from "@/hooks/useAuth"
 import {
-  DEFAULT_LOCATION,
   DashboardFiltersProvider,
   MONTHS,
   useDashboardFilters,
@@ -227,20 +223,10 @@ function HeaderLocationPicker() {
             OpenStreetMap
           </div>
         </div>
-        <div className="mt-3 flex items-center justify-between gap-3 text-xs text-[#6c655a]">
+        <div className="mt-3 text-xs text-[#6c655a]">
           <div className="min-w-0">
             {gpsStatus ?? `Lat ${location.lat.toFixed(5)}, Lon ${location.lon.toFixed(5)}`}
           </div>
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            className="h-8 shrink-0 gap-1.5 rounded-xl border-[#d9ccb9] bg-white text-xs"
-            onClick={() => setLocation(DEFAULT_LOCATION)}
-          >
-            <Crosshair className="size-3.5" />
-            Reset Malang
-          </Button>
         </div>
       </DropdownMenuContent>
     </DropdownMenu>
@@ -267,20 +253,6 @@ function LayoutContent() {
               <HeaderLocationPicker />
               <HeaderMonthSelect />
               <div className="ml-auto flex items-center gap-2.5">
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-10 rounded-full border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_1px_2px_rgba(117,92,48,0.05)] hover:bg-[#eef4ea] hover:text-[#17352b]"
-                >
-                  <CircleHelp />
-                </Button>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="size-10 rounded-full border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_1px_2px_rgba(117,92,48,0.05)] hover:bg-[#eef4ea] hover:text-[#17352b]"
-                >
-                  <Bell />
-                </Button>
                 <Button
                   variant="outline"
                   className="h-11 gap-3 rounded-[24px] border-[#d8ccb7] bg-[#fffaf2] pl-5! pr-4! text-left text-[#24473b] shadow-[0_1px_2px_rgba(117,92,48,0.05)] hover:bg-[#eef4ea]"

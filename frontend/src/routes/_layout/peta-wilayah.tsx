@@ -18,7 +18,7 @@ export const Route = createFileRoute("/_layout/peta-wilayah")({
   head: () => ({
     meta: [
       {
-        title: "Peta & Wilayah Lahan - TaniLink",
+        title: "TaniLink",
       },
     ],
   }),

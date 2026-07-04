@@ -1,7 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router"
 import {
   AlertTriangle,
-  Info,
   Sprout,
 } from "lucide-react"
 import { useEffect, useState } from "react"
@@ -35,7 +34,7 @@ import { useDashboardFilters } from "@/lib/dashboard-filters"
 export const Route = createFileRoute("/_layout/kesesuaian-lahan")({
   component: KesesuaianLahan,
   head: () => ({
-    meta: [{ title: "Kecocokan Lahan - TaniLink" }],
+    meta: [{ title: "TaniLink" }],
   }),
 })
 
@@ -184,26 +183,6 @@ function KesesuaianLahan() {
         </CardContent>
       </Card>
 
-      <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-        <CardContent className="flex flex-col gap-3 p-5 lg:flex-row lg:items-center lg:justify-between">
-          <div className="rounded-xl border border-[#efe4d3] bg-[#fffdf9] px-4 py-3 text-xs text-[#6c655a]">
-            Lokasi aktif:{" "}
-            <span className="font-semibold text-[#163127]">
-              Lat {location.lat.toFixed(5)}, Lon {location.lon.toFixed(5)}
-            </span>
-          </div>
-          {data ? (
-            <div className="rounded-xl border border-[#efe4d3] bg-[#fffdf9] px-4 py-3 text-xs text-[#6c655a]">
-              Matched point{" "}
-              <span className="font-semibold text-[#163127]">
-                {data.matched_point.point_id}
-              </span>{" "}
-              ({data.matched_point.distance_deg})
-            </div>
-          ) : null}
-        </CardContent>
-      </Card>
-
       {error ? (
         <Alert className="rounded-[18px] border-[#fbc4c4] bg-[#fff7f7]">
           <AlertTriangle className="size-4" />
@@ -276,17 +255,6 @@ function KesesuaianLahan() {
               </div>
             </CardContent>
           </Card>
-
-          <Alert className="rounded-[18px] border-[#dce6d2] bg-[#fbfff8]">
-            <Info className="size-4" />
-            <AlertTitle>Catatan handoff</AlertTitle>
-            <AlertDescription>
-              Halaman ini tidak menampilkan pH, C-organik, atau nutrien tanah
-              karena field itu tidak ada di kontrak handoff. Kecocokan dihitung
-              dari model suitability precompute dan disajikan bersama interval
-              ketidakpastiannya.
-            </AlertDescription>
-          </Alert>
         </>
       )}
     </div>

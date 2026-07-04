@@ -27,7 +27,7 @@ import {
 export const Route = createFileRoute("/_layout/rekomendasi-tanam")({
   component: RekomendasiTanam,
   head: () => ({
-    meta: [{ title: "Rekomendasi Tanam - TaniLink" }],
+    meta: [{ title: "TaniLink" }],
   }),
 })
 

@@ -51,7 +51,7 @@ export const Route = createFileRoute("/signup")({
   head: () => ({
     meta: [
       {
-        title: "Daftar - TaniLink",
+        title: "TaniLink",
       },
     ],
   }),

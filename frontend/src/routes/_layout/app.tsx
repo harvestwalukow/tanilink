@@ -7,7 +7,7 @@ export const Route = createFileRoute("/_layout/app")({
   head: () => ({
     meta: [
       {
-        title: "Dashboard - TaniLink",
+        title: "TaniLink",
       },
     ],
   }),

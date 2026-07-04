@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="TaniLink">
+  <rect width="64" height="64" rx="16" fill="#24473b"/>
+  <path
+    d="M46.6 14.8c-9.7.5-19.5 4.7-24.4 11.7-3.3 4.7-3.5 10.4-.5 14.2l-5.2 5.2a2.8 2.8 0 0 0 4 4l5.2-5.2c3.8 2.9 9.5 2.7 14.2-.5 7-4.9 11.2-14.7 11.7-24.4.1-2.9-2.1-5.1-5-5z"
+    fill="#f7f2e8"
+  />
+  <path
+    d="M25.4 39.3c4.5-8.6 10.8-14 19.5-17.4"
+    fill="none"
+    stroke="#2f5d50"
+    stroke-width="4.2"
+    stroke-linecap="round"
+  />
+  <path
+    d="M31.8 34.2c-2.9-.2-5.1-1.2-6.9-3M37.1 29.1c-1.8-1.7-2.7-3.8-2.9-6.2"
+    fill="none"
+    stroke="#2f5d50"
+    stroke-width="3.2"
+    stroke-linecap="round"
+  />
+</svg>

@@ -49,7 +49,7 @@ import {
 export const Route = createFileRoute("/_layout/prediksi-harga")({
   component: PrediksiHarga,
   head: () => ({
-    meta: [{ title: "Prediksi Harga Komoditas - TaniLink" }],
+    meta: [{ title: "TaniLink" }],
   }),
 })
 
@@ -459,21 +459,6 @@ function PrediksiHarga() {
                 </Table>
               </div>
             )}
-            <div className="grid gap-3 rounded-[16px] border border-[#efe4d3] bg-[#fffdf9] p-4 text-xs leading-relaxed text-[#6c655a] md:grid-cols-3">
-              <div className="min-w-0">
-                <span className="font-semibold text-[#163127]">Model:</span>{" "}
-                {forecast.model_menang ?? "-"}
-              </div>
-              <div className="min-w-0">
-                <span className="font-semibold text-[#163127]">MAE:</span>{" "}
-                {forecast.mae_model ?? "-"} vs baseline{" "}
-                {forecast.mae_naive_baseline ?? "-"}
-              </div>
-              <div className="min-w-0">
-                <span className="font-semibold text-[#163127]">Aturan:</span>{" "}
-                {forecast.aturan_seleksi ?? "-"}
-              </div>
-            </div>
           </CardContent>
         </Card>
       ) : isLoading ? (
