@@ -86,46 +86,50 @@ function SuitabilityCard({ item }: { item: Recommendation }) {
       : "-"
 
   return (
-    <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-      <CardHeader className="pb-3">
-        <div className="flex items-start justify-between gap-3">
-          <div>
-            <CardTitle className="font-[Fraunces] text-xl text-[#1d3429]">
-              {commodityLabel(item.komoditas)}
-            </CardTitle>
-            <CardDescription>
-              {suitabilityClass(item.suitability_norm)}
-            </CardDescription>
+    <div className="flex h-full min-h-[218px] flex-col rounded-[18px] border border-[#eadfcf] bg-white p-5 text-left shadow-sm">
+      <div className="flex min-h-[58px] items-start justify-between gap-4">
+        <div className="min-w-0">
+          <div className="font-[Fraunces] text-xl leading-tight text-[#1d3429]">
+            {commodityLabel(item.komoditas)}
           </div>
-          <Badge variant="outline" className={`rounded-md ${badge.className}`}>
-            {badge.label}
-          </Badge>
+          <div className="mt-2 flex min-h-[26px] flex-wrap items-start gap-1.5">
+            <Badge variant="outline" className="rounded-md px-2 py-0.5">
+              {suitabilityClass(item.suitability_norm)}
+            </Badge>
+            <Badge variant="outline" className={`rounded-md ${badge.className}`}>
+              {badge.label}
+            </Badge>
+          </div>
         </div>
-      </CardHeader>
-      <CardContent className="grid gap-3">
+
+        <div className="shrink-0 text-right">
+          <div className="font-[Fraunces] text-[1.72rem] leading-none text-[#1d3429]">
+            {formatPercent(item.suitability_norm)}
+          </div>
+          <div className="mt-1 text-[10px] text-[#8d8478]">kecocokan</div>
+        </div>
+      </div>
+
+      <div className="mt-5 grid flex-1 content-start gap-4">
         <div>
-          <div className="mb-1 flex justify-between text-xs text-[#6c655a]">
+          <div className="mb-2 flex justify-between gap-3 text-[11px] text-[#6c655a]">
             <span>Kecocokan lahan</span>
-            <span className="font-semibold text-[#163127]">
+            <span className="shrink-0 font-semibold text-[#163127]">
               {formatPercent(item.suitability_norm)}
             </span>
           </div>
           <ScoreBar value={item.suitability_norm} />
-        </div>
-        <div className="rounded-[14px] border border-[#efe4d3] bg-[#fffdf9] p-3 text-xs text-[#6c655a]">
-          <div>
-            <span className="font-semibold text-[#163127]">
-              Rentang keyakinan:
-            </span>{" "}
-            {interval}
-          </div>
-          <div className="mt-1">
-            <span className="font-semibold text-[#163127]">Sumber:</span>{" "}
-            {item.sumber_suitability}
+          <div className="mt-2 text-[10px] leading-none text-[#8d8478]">
+            Rentang keyakinan: {interval}
           </div>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      <div className="mt-5 border-t border-[#f4eadb] pt-3 text-xs leading-relaxed text-[#6c655a]">
+        <div className="font-semibold text-[#163127]">Sumber model</div>
+        <div className="mt-1">{item.sumber_suitability}</div>
+      </div>
+    </div>
   )
 }
 
@@ -159,7 +163,7 @@ function KesesuaianLahan() {
   return (
     <div className="flex flex-col gap-4">
       <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-        <CardContent className="grid gap-3 p-4 lg:grid-cols-[1fr_auto] lg:items-center">
+        <CardContent className="grid gap-4 p-5 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <h1 className="font-[Fraunces] text-2xl leading-tight text-[#1d3429]">
               Detail kecocokan lahan
@@ -181,15 +185,15 @@ function KesesuaianLahan() {
       </Card>
 
       <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-        <CardContent className="flex flex-col gap-3 p-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="rounded-xl border border-[#efe4d3] bg-[#fffdf9] px-3 py-2 text-xs text-[#6c655a]">
+        <CardContent className="flex flex-col gap-3 p-5 lg:flex-row lg:items-center lg:justify-between">
+          <div className="rounded-xl border border-[#efe4d3] bg-[#fffdf9] px-4 py-3 text-xs text-[#6c655a]">
             Lokasi aktif:{" "}
             <span className="font-semibold text-[#163127]">
               Lat {location.lat.toFixed(5)}, Lon {location.lon.toFixed(5)}
             </span>
           </div>
           {data ? (
-            <div className="rounded-xl border border-[#efe4d3] bg-[#fffdf9] px-3 py-2 text-xs text-[#6c655a]">
+            <div className="rounded-xl border border-[#efe4d3] bg-[#fffdf9] px-4 py-3 text-xs text-[#6c655a]">
               Matched point{" "}
               <span className="font-semibold text-[#163127]">
                 {data.matched_point.point_id}
@@ -214,14 +218,14 @@ function KesesuaianLahan() {
         </Card>
       ) : (
         <>
-          <div className="grid gap-3 xl:grid-cols-3">
+          <div className="grid items-stretch gap-4 xl:grid-cols-3">
             {recommendations.map((item) => (
               <SuitabilityCard key={item.komoditas} item={item} />
             ))}
           </div>
 
           <Card className="overflow-hidden rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-            <CardHeader>
+            <CardHeader className="px-5 pb-3 pt-5">
               <CardTitle className="flex items-center gap-2 text-base text-[#1d3429]">
                 <Sprout className="size-4" />
                 Tabel audit suitability
@@ -231,43 +235,45 @@ function KesesuaianLahan() {
                 dengan tren dan risiko harga pada decision score.
               </CardDescription>
             </CardHeader>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader className="bg-[#fffbf4]">
-                  <TableRow>
-                    <TableHead>Komoditas</TableHead>
-                    <TableHead>Kecocokan</TableHead>
-                    <TableHead>Rentang keyakinan</TableHead>
-                    <TableHead>Keandalan</TableHead>
-                    <TableHead>Sumber model</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {recommendations.map((item) => {
-                    const badge = sourceBadge(item.sumber_suitability)
-                    return (
-                      <TableRow key={item.komoditas}>
-                        <TableCell className="font-semibold text-[#163127]">
-                          {commodityLabel(item.komoditas)}
-                        </TableCell>
-                        <TableCell>{formatPercent(item.suitability_norm)}</TableCell>
-                        <TableCell>
-                          {formatPercent(item.suitability_lo)} -{" "}
-                          {formatPercent(item.suitability_hi)}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className={`rounded-md ${badge.className}`}>
-                            {badge.label}
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="max-w-[420px] text-xs text-[#6c655a]">
-                          {item.sumber_suitability}
-                        </TableCell>
-                      </TableRow>
-                    )
-                  })}
-                </TableBody>
-              </Table>
+            <CardContent className="px-5 pb-5">
+              <div className="overflow-hidden rounded-[16px] border border-[#efe4d3]">
+                <Table>
+                  <TableHeader className="bg-[#fffbf4]">
+                    <TableRow>
+                      <TableHead>Komoditas</TableHead>
+                      <TableHead>Kecocokan</TableHead>
+                      <TableHead>Rentang keyakinan</TableHead>
+                      <TableHead>Keandalan</TableHead>
+                      <TableHead>Sumber model</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {recommendations.map((item) => {
+                      const badge = sourceBadge(item.sumber_suitability)
+                      return (
+                        <TableRow key={item.komoditas}>
+                          <TableCell className="font-semibold text-[#163127]">
+                            {commodityLabel(item.komoditas)}
+                          </TableCell>
+                          <TableCell>{formatPercent(item.suitability_norm)}</TableCell>
+                          <TableCell>
+                            {formatPercent(item.suitability_lo)} -{" "}
+                            {formatPercent(item.suitability_hi)}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className={`rounded-md ${badge.className}`}>
+                              {badge.label}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="max-w-[420px] text-xs text-[#6c655a]">
+                            {item.sumber_suitability}
+                          </TableCell>
+                        </TableRow>
+                      )
+                    })}
+                  </TableBody>
+                </Table>
+              </div>
             </CardContent>
           </Card>
 
