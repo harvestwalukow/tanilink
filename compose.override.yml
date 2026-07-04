@@ -87,6 +87,7 @@ services:
       SMTP_PORT: "1025"
       SMTP_TLS: "false"
       EMAILS_FROM_EMAIL: "noreply@example.com"
+      GOOGLE_CLIENT_ID: "${GOOGLE_CLIENT_ID}"
 
   mailcatcher:
     image: schickling/mailcatcher
@@ -112,6 +113,7 @@ services:
       - frontend-node-modules:/app/frontend/node_modules
     environment:
       - VITE_API_URL=http://localhost:8000
+      - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
       - CHOKIDAR_USEPOLLING=true
       - WATCHPACK_POLLING=true
     labels:
@@ -123,6 +125,7 @@ services:
       dockerfile: frontend/Dockerfile.playwright
       args:
         - VITE_API_URL=http://backend:8000
+        - VITE_GOOGLE_CLIENT_ID=${VITE_GOOGLE_CLIENT_ID}
         - NODE_ENV=production
     ipc: host
     depends_on:

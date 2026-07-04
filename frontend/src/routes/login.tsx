@@ -9,6 +9,7 @@ import { z } from "zod"
 
 import type { Body_login_login_access_token as AccessToken } from "@/client"
 import { AuthLayout } from "@/components/Common/AuthLayout"
+import { GoogleAuthButton } from "@/components/Common/GoogleAuthButton"
 import {
   Form,
   FormControl,
@@ -82,6 +83,14 @@ function Login() {
           </div>
 
           <div className="grid gap-4">
+            <GoogleAuthButton />
+
+            <div className="flex items-center gap-3 text-xs text-[#8d8478]">
+              <div className="h-px flex-1 bg-[#e4d8c5]" />
+              atau
+              <div className="h-px flex-1 bg-[#e4d8c5]" />
+            </div>
+
             <FormField
               control={form.control}
               name="username"
@@ -107,21 +116,21 @@ function Login() {
               render={({ field }) => (
                 <FormItem>
                   <div className="flex items-center">
-                  <FormLabel>Kata sandi</FormLabel>
-                  <RouterLink
-                    to="/recover-password"
-                    className="ml-auto text-sm text-[#5f685b] underline-offset-4 hover:text-[#17352b] hover:underline"
-                  >
-                    Lupa kata sandi?
-                  </RouterLink>
-                </div>
-                <FormControl>
-                  <PasswordInput
-                    data-testid="password-input"
-                    placeholder="Masukkan kata sandi"
-                    {...field}
-                  />
-                </FormControl>
+                    <FormLabel>Kata sandi</FormLabel>
+                    <RouterLink
+                      to="/recover-password"
+                      className="ml-auto text-sm text-[#5f685b] underline-offset-4 hover:text-[#17352b] hover:underline"
+                    >
+                      Lupa kata sandi?
+                    </RouterLink>
+                  </div>
+                  <FormControl>
+                    <PasswordInput
+                      data-testid="password-input"
+                      placeholder="Masukkan kata sandi"
+                      {...field}
+                    />
+                  </FormControl>
                   <FormMessage className="text-xs" />
                 </FormItem>
               )}

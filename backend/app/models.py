@@ -119,6 +119,10 @@ class Token(SQLModel):
     token_type: str = "bearer"
 
 
+class GoogleLogin(SQLModel):
+    credential: str
+
+
 # Contents of JWT token
 class TokenPayload(SQLModel):
     sub: str | None = None

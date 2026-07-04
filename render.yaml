@@ -65,6 +65,8 @@ services:
           property: password
       - key: SENTRY_DSN
         sync: false
+      - key: GOOGLE_CLIENT_ID
+        sync: false
 
   - type: web
     name: tanilink-web
@@ -76,3 +78,5 @@ services:
     envVars:
       - key: VITE_API_URL
         value: https://tanilink-api.onrender.com
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false

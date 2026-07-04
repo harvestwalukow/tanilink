@@ -4,6 +4,8 @@ import { useNavigate } from "@tanstack/react-router"
 import {
   type Body_login_login_access_token as AccessToken,
   LoginService,
+  OpenAPI,
+  type Token,
   type UserPublic,
   type UserRegister,
   UsersService,
@@ -74,9 +76,35 @@ const useAuth = () => {
     localStorage.setItem("access_token", response.access_token)
   }
 
+  const googleLogin = async (credential: string) => {
+    const apiBase = OpenAPI.BASE ?? ""
+    const response = await fetch(`${apiBase}/api/v1/login/google`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ credential }),
+    })
+    const body = await response.json()
+    if (!response.ok) {
+      throw Object.assign(new Error(body.detail || "Google login failed"), {
+        body,
+      })
+    }
+    localStorage.setItem("access_token", (body as Token).access_token)
+  }
+
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] })
+      navigate({ to: APP_HOME_PATH })
+    },
+    onError: handleError.bind(showErrorToast),
+  })
+
+  const googleLoginMutation = useMutation({
+    mutationFn: googleLogin,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["currentUser"] })
       navigate({ to: APP_HOME_PATH })
     },
     onError: handleError.bind(showErrorToast),
@@ -84,12 +112,14 @@ const useAuth = () => {
 
   const logout = () => {
     localStorage.removeItem("access_token")
+    queryClient.removeQueries({ queryKey: ["currentUser"] })
     navigate({ to: "/login" })
   }
 
   return {
     signUpMutation,
     loginMutation,
+    googleLoginMutation,
     logout,
     user,
   }

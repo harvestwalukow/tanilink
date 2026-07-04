@@ -11,6 +11,7 @@ import { useState, type MouseEvent } from "react"
 import { Footer } from "@/components/Common/Footer"
 import AppSidebar from "@/components/Sidebar/AppSidebar"
 import { isLoggedIn } from "@/hooks/useAuth"
+import useAuth from "@/hooks/useAuth"
 import {
   DashboardFiltersProvider,
   MONTHS,
@@ -30,6 +31,7 @@ import {
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -234,6 +236,10 @@ function HeaderLocationPicker() {
 }
 
 function LayoutContent() {
+  const { logout, user } = useAuth()
+  const userName = user?.full_name || user?.email || "TaniLink"
+  const userRole = user?.is_superuser ? "Admin" : "Petani"
+
   return (
     <div className="app-shell">
       <SidebarProvider>
@@ -253,20 +259,35 @@ function LayoutContent() {
               <HeaderLocationPicker />
               <HeaderMonthSelect />
               <div className="ml-auto flex items-center gap-2.5">
-                <Button
-                  variant="outline"
-                  className="h-11 gap-3 rounded-[24px] border-[#d8ccb7] bg-[#fffaf2] pl-5! pr-4! text-left text-[#24473b] shadow-[0_1px_2px_rgba(117,92,48,0.05)] hover:bg-[#eef4ea]"
-                >
-                  <div className="min-w-0 flex-1 text-left">
-                    <div className="truncate text-[0.95rem] font-semibold leading-tight text-[#2c3c2d]">
-                      Andi Setiawan
-                    </div>
-                    <div className="truncate pt-0.5 text-[0.78rem] leading-tight text-[#7b7468]">
-                      Petani
-                    </div>
-                  </div>
-                  <ChevronDown className="size-4 text-[#24473b]" />
-                </Button>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="h-11 gap-3 rounded-[24px] border-[#d8ccb7] bg-[#fffaf2] pl-5! pr-4! text-left text-[#24473b] shadow-[0_1px_2px_rgba(117,92,48,0.05)] hover:bg-[#eef4ea]"
+                    >
+                      <div className="min-w-0 flex-1 text-left">
+                        <div className="max-w-[180px] truncate text-[0.95rem] font-semibold leading-tight text-[#2c3c2d]">
+                          {userName}
+                        </div>
+                        <div className="truncate pt-0.5 text-[0.78rem] leading-tight text-[#7b7468]">
+                          {userRole}
+                        </div>
+                      </div>
+                      <ChevronDown className="size-4 text-[#24473b]" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-48 rounded-2xl border-[#d8ccb7] bg-[#fffaf2] p-2 text-[#24473b] shadow-[0_16px_40px_rgba(74,98,79,0.18)]"
+                  >
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-xl px-3 py-2 text-sm text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]"
+                      onClick={logout}
+                    >
+                      Logout
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
               </div>
             </div>
           </header>

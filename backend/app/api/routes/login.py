@@ -1,6 +1,8 @@
+import secrets
 from datetime import timedelta
 from typing import Annotated, Any
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.responses import HTMLResponse
 from fastapi.security import OAuth2PasswordRequestForm
@@ -9,7 +11,15 @@ from app import crud
 from app.api.deps import CurrentUser, SessionDep, get_current_active_superuser
 from app.core import security
 from app.core.config import settings
-from app.models import Message, NewPassword, Token, UserPublic, UserUpdate
+from app.models import (
+    GoogleLogin,
+    Message,
+    NewPassword,
+    Token,
+    UserCreate,
+    UserPublic,
+    UserUpdate,
+)
 from app.utils import (
     generate_password_reset_token,
     generate_reset_password_email,
@@ -18,6 +28,15 @@ from app.utils import (
 )
 
 router = APIRouter(tags=["login"])
+
+
+def _token_for_user(user_id: Any) -> Token:
+    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    return Token(
+        access_token=security.create_access_token(
+            user_id, expires_delta=access_token_expires
+        )
+    )
 
 
 @router.post("/login/access-token")
@@ -34,12 +53,58 @@ def login_access_token(
         raise HTTPException(status_code=400, detail="Incorrect email or password")
     elif not user.is_active:
         raise HTTPException(status_code=400, detail="Inactive user")
-    access_token_expires = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
-    return Token(
-        access_token=security.create_access_token(
-            user.id, expires_delta=access_token_expires
+    return _token_for_user(user.id)
+
+
+@router.post("/login/google", response_model=Token)
+def login_google(session: SessionDep, body: GoogleLogin) -> Token:
+    """
+    Verify a Google ID token and exchange it for this app's access token.
+    """
+    if not settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=503, detail="Google login is not configured")
+
+    try:
+        response = httpx.get(
+            "https://oauth2.googleapis.com/tokeninfo",
+            params={"id_token": body.credential},
+            timeout=5,
         )
-    )
+    except httpx.HTTPError as exc:
+        raise HTTPException(status_code=401, detail="Google login failed") from exc
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=401, detail="Invalid Google credential")
+
+    payload = response.json()
+    if payload.get("aud") != settings.GOOGLE_CLIENT_ID:
+        raise HTTPException(status_code=401, detail="Google credential audience mismatch")
+    if payload.get("email_verified") not in (True, "true", "True"):
+        raise HTTPException(status_code=401, detail="Google email is not verified")
+
+    email = payload.get("email")
+    if not email:
+        raise HTTPException(status_code=401, detail="Google credential has no email")
+
+    user = crud.get_user_by_email(session=session, email=email)
+    if not user:
+        user = crud.create_user(
+            session=session,
+            user_create=UserCreate(
+                email=email,
+                full_name=payload.get("name"),
+                password=secrets.token_urlsafe(32),
+            ),
+        )
+    elif not user.is_active:
+        raise HTTPException(status_code=400, detail="Inactive user")
+    elif payload.get("name") and not user.full_name:
+        user.full_name = payload["name"]
+        session.add(user)
+        session.commit()
+        session.refresh(user)
+
+    return _token_for_user(user.id)
 
 
 @router.post("/login/test-token", response_model=UserPublic)
