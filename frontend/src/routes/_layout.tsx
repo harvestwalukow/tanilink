@@ -1,9 +1,25 @@
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router"
-import { Bell, ChevronDown, CircleHelp, Search } from "lucide-react"
+import {
+  Bell,
+  Calendar as CalendarIcon,
+  ChevronDown,
+  CircleHelp,
+  Crosshair,
+  LocateFixed,
+  MapPin,
+  Search,
+} from "lucide-react"
+import { useState, type MouseEvent } from "react"
 
 import { Footer } from "@/components/Common/Footer"
 import AppSidebar from "@/components/Sidebar/AppSidebar"
 import { isLoggedIn } from "@/hooks/useAuth"
+import {
+  DEFAULT_LOCATION,
+  DashboardFiltersProvider,
+  MONTHS,
+  useDashboardFilters,
+} from "@/lib/dashboard-filters"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -15,6 +31,11 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 import {
   SidebarInset,
   SidebarProvider,
@@ -30,7 +51,203 @@ export const Route = createFileRoute("/_layout")({
   },
 })
 
-function Layout() {
+function HeaderMonthSelect() {
+  const { month, setMonth } = useDashboardFilters()
+
+  return (
+    <Select value={String(month)} onValueChange={(value) => setMonth(Number(value))}>
+      <SelectTrigger className="h-9 min-w-[132px] rounded-2xl border-[#d8ccb7] bg-[#f7f2e8] text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
+        <CalendarIcon className="mr-2 size-4" />
+        <SelectValue placeholder="Bulan tanam" />
+      </SelectTrigger>
+      <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
+        <SelectGroup>
+          {MONTHS.map((label, index) => (
+            <SelectItem
+              key={label}
+              value={String(index + 1)}
+              className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]"
+            >
+              {label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
+      </SelectContent>
+    </Select>
+  )
+}
+
+function lonLatToTile(lon: number, lat: number, zoom: number) {
+  const latRad = (lat * Math.PI) / 180
+  const scale = 2 ** zoom
+  return {
+    x: ((lon + 180) / 360) * scale,
+    y:
+      ((1 -
+        Math.log(Math.tan(latRad) + 1 / Math.cos(latRad)) / Math.PI) /
+        2) *
+      scale,
+  }
+}
+
+function tileToLonLat(x: number, y: number, zoom: number) {
+  const scale = 2 ** zoom
+  const lon = (x / scale) * 360 - 180
+  const n = Math.PI - (2 * Math.PI * y) / scale
+  const lat = (180 / Math.PI) * Math.atan(0.5 * (Math.exp(n) - Math.exp(-n)))
+  return { lat, lon }
+}
+
+function HeaderLocationPicker() {
+  const { location, setLocation, hasPickedLocation } = useDashboardFilters()
+  const [gpsStatus, setGpsStatus] = useState<string | null>(null)
+  const zoom = 8
+  const center = lonLatToTile(location.lon, location.lat, zoom)
+  const centerTileX = Math.floor(center.x)
+  const centerTileY = Math.floor(center.y)
+  const markerX = 256 + (center.x - centerTileX) * 256
+  const markerY = 256 + (center.y - centerTileY) * 256
+  const tiles = []
+
+  for (let dx = -1; dx <= 1; dx += 1) {
+    for (let dy = -1; dy <= 1; dy += 1) {
+      tiles.push({
+        key: `${dx}:${dy}`,
+        x: centerTileX + dx,
+        y: centerTileY + dy,
+        left: (dx + 1) * 256,
+        top: (dy + 1) * 256,
+      })
+    }
+  }
+
+  const handleMapClick = (event: MouseEvent<HTMLDivElement>) => {
+    const rect = event.currentTarget.getBoundingClientRect()
+    const clickX = (event.clientX - rect.left) / rect.width
+    const clickY = (event.clientY - rect.top) / rect.height
+    const tileX = centerTileX - 1 + clickX * 3
+    const tileY = centerTileY - 1 + clickY * 3
+    const next = tileToLonLat(tileX, tileY, zoom)
+    setLocation({
+      lat: Number(next.lat.toFixed(5)),
+      lon: Number(next.lon.toFixed(5)),
+      label: "Lokasi dipilih",
+    })
+    setGpsStatus(null)
+  }
+
+  const useGpsLocation = () => {
+    if (!navigator.geolocation) {
+      setGpsStatus("GPS tidak tersedia di browser ini.")
+      return
+    }
+    setGpsStatus("Mengambil lokasi...")
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setLocation({
+          lat: Number(position.coords.latitude.toFixed(5)),
+          lon: Number(position.coords.longitude.toFixed(5)),
+          label: "Lokasi saya",
+        })
+        setGpsStatus("Lokasi GPS dipakai.")
+      },
+      () => setGpsStatus("Izin lokasi ditolak atau gagal dibaca."),
+      { enableHighAccuracy: true, timeout: 10000 },
+    )
+  }
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="outline"
+          className="h-9 min-w-[180px] justify-between rounded-2xl border-[#d8ccb7] bg-[#f7f2e8] px-3 text-[#24473b] shadow-none hover:bg-[#eef4ea]"
+        >
+          <span className="flex min-w-0 items-center gap-2">
+            <MapPin className="size-4 shrink-0" />
+            <span className="truncate">
+              {hasPickedLocation ? location.label : "Pilih Lokasi"}
+            </span>
+          </span>
+          <ChevronDown className="size-4 shrink-0" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="start"
+        className="w-[430px] rounded-2xl border-[#d8ccb7] bg-[#fffaf2] p-3 text-[#24473b] shadow-[0_16px_40px_rgba(74,98,79,0.18)]"
+      >
+        <div className="mb-3 flex items-start justify-between gap-3">
+          <div>
+            <div className="font-[Fraunces] text-lg font-semibold text-[#163127]">
+              Pilih Lokasi
+            </div>
+            <div className="text-xs text-[#6c655a]">
+              Klik peta untuk menentukan lat/lon rekomendasi.
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 rounded-xl border-[#d9ccb9] bg-white text-xs"
+            onClick={useGpsLocation}
+          >
+            <LocateFixed className="size-3.5" />
+            Pakai GPS
+          </Button>
+        </div>
+        <div
+          role="button"
+          aria-label="Pilih titik lokasi di peta"
+          className="relative h-[260px] cursor-crosshair overflow-hidden rounded-2xl border border-[#e2d7c4] bg-[#e8decf]"
+          onClick={handleMapClick}
+        >
+          <div
+            className="absolute left-1/2 top-1/2 size-[768px] -translate-x-1/2 -translate-y-1/2"
+            style={{ transform: `translate(${-markerX + 384}px, ${-markerY + 384}px)` }}
+          >
+            {tiles.map((tile) => (
+              <img
+                key={tile.key}
+                src={`https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`}
+                alt=""
+                className="absolute size-64 select-none"
+                draggable={false}
+                style={{ left: tile.left, top: tile.top }}
+              />
+            ))}
+          </div>
+          <div className="pointer-events-none absolute left-1/2 top-1/2 flex -translate-x-1/2 -translate-y-full flex-col items-center">
+            <MapPin className="size-9 fill-[#24473b] text-[#24473b] drop-shadow-md" />
+            <span className="mt-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-[#163127] shadow-sm">
+              {location.lat.toFixed(4)}, {location.lon.toFixed(4)}
+            </span>
+          </div>
+          <div className="pointer-events-none absolute bottom-3 left-3 rounded-full bg-white/90 px-2.5 py-1 text-[10px] text-[#6c655a] shadow-sm">
+            OpenStreetMap
+          </div>
+        </div>
+        <div className="mt-3 flex items-center justify-between gap-3 text-xs text-[#6c655a]">
+          <div className="min-w-0">
+            {gpsStatus ?? `Lat ${location.lat.toFixed(5)}, Lon ${location.lon.toFixed(5)}`}
+          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="h-8 shrink-0 gap-1.5 rounded-xl border-[#d9ccb9] bg-white text-xs"
+            onClick={() => setLocation(DEFAULT_LOCATION)}
+          >
+            <Crosshair className="size-3.5" />
+            Reset Malang
+          </Button>
+        </div>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  )
+}
+
+function LayoutContent() {
   return (
     <div className="app-shell">
       <SidebarProvider>
@@ -47,33 +264,8 @@ function Layout() {
                   className="h-9 rounded-2xl border-[#e3d7c6] bg-white pl-11 text-sm text-[#6c655a] shadow-none"
                 />
               </div>
-              <Select defaultValue="jombang">
-                <SelectTrigger className="h-9 min-w-[180px] rounded-2xl border-[#d8ccb7] bg-[#f7f2e8] text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
-                  <SelectValue placeholder="Pilih wilayah" />
-                </SelectTrigger>
-                <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
-                  <SelectGroup>
-                    <SelectItem
-                      value="jombang"
-                      className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]"
-                    >
-                      Jawa Timur - Kab. Jombang
-                    </SelectItem>
-                    <SelectItem
-                      value="madiun"
-                      className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]"
-                    >
-                      Jawa Timur - Kab. Madiun
-                    </SelectItem>
-                    <SelectItem
-                      value="ngawi"
-                      className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]"
-                    >
-                      Jawa Timur - Kab. Ngawi
-                    </SelectItem>
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
+              <HeaderLocationPicker />
+              <HeaderMonthSelect />
               <div className="ml-auto flex items-center gap-2.5">
                 <Button
                   variant="outline"
@@ -115,6 +307,14 @@ function Layout() {
         </SidebarInset>
       </SidebarProvider>
     </div>
+  )
+}
+
+function Layout() {
+  return (
+    <DashboardFiltersProvider>
+      <LayoutContent />
+    </DashboardFiltersProvider>
   )
 }
 

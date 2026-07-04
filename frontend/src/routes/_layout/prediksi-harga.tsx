@@ -1,23 +1,24 @@
 import { createFileRoute } from "@tanstack/react-router"
 import {
+  AlertTriangle,
   Download,
-  HelpCircle,
   LineChart as LineChartIcon,
-  Sliders,
   Table as TableIcon,
+  TrendingDown,
+  TrendingUp,
 } from "lucide-react"
-import { useMemo, useRef, useState } from "react"
+import { useEffect, useMemo, useRef, useState } from "react"
 import { toast } from "sonner"
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
 import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import {
   Select,
   SelectContent,
@@ -35,599 +36,451 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import {
+  type Commodity,
+  type ForecastPoint,
+  type ForecastResponse,
+  COMMODITIES,
+  commodityLabel,
+  formatCurrency,
+  getForecast,
+} from "@/lib/ml-api"
 
 export const Route = createFileRoute("/_layout/prediksi-harga")({
   component: PrediksiHarga,
   head: () => ({
-    meta: [
-      {
-        title: "Prediksi Harga Komoditas - TaniLink",
-      },
-    ],
+    meta: [{ title: "Prediksi Harga Komoditas - TaniLink" }],
   }),
 })
 
-// Configuration for commodities
-const commoditiesConfig = {
-  padi: { label: "Padi Sawah", color: "#2f5d50", bg: "bg-[#2f5d50]" },
-  jagung: { label: "Jagung", color: "#d18a2f", bg: "bg-[#d18a2f]" },
-  cabai: { label: "Cabai Merah", color: "#e7644c", bg: "bg-[#e7644c]" },
-  bawang: { label: "Bawang Merah", color: "#8f64d8", bg: "bg-[#8f64d8]" },
-  tebu: { label: "Tebu", color: "#7f7a70", bg: "bg-[#7f7a70]" },
-} as const
-
-type CommodityKey = keyof typeof commoditiesConfig
-
-// Generate 90 days of forecast data starting from 19 Mei 2025
-const generateForecastData = () => {
-  const data = []
-  const start = new Date(2025, 4, 19)
-  for (let i = 0; i < 90; i++) {
-    const d = new Date(start)
-    d.setDate(start.getDate() + i)
-
-    // Price trend generators
-    const padi = 12200 + Math.sin(i / 12) * 350 + i * 12 + (i % 3) * 30
-    const jagung = 5800 + Math.cos(i / 15) * 250 - i * 6 + (i % 2) * 20
-    const cabai = 38000 + Math.sin(i / 6) * 3200 + i * 160 + (i % 4) * 180
-    const bawang = 31000 + Math.cos(i / 10) * 1800 + i * 75 - (i % 3) * 80
-    const tebu = 14800 + Math.sin(i / 25) * 80 + i * 3.5 + (i % 2) * 10
-
-    data.push({
-      index: i,
-      date: d,
-      dateStr: d.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "short",
-      }),
-      dateFull: d.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      }),
-      padi: Math.round(padi),
-      jagung: Math.round(jagung),
-      cabai: Math.round(cabai),
-      bawang: Math.round(bawang),
-      tebu: Math.round(tebu),
-    })
-  }
-  return data
+const COMMODITY_COLORS: Record<Commodity, string> = {
+  padi: "#2f5d50",
+  jagung: "#d18a2f",
+  kedelai: "#607e3f",
+  tebu: "#7f7a70",
+  cabai: "#e7644c",
+  bawang_merah: "#8f64d8",
 }
 
-const forecastData = generateForecastData()
+function RiskBadge({ risk }: { risk: ForecastResponse["kelas_risiko"] }) {
+  const tone =
+    risk === "rendah"
+      ? "border-[#cce0b8] bg-[#e5efda] text-[#4d6839]"
+      : risk === "sedang"
+        ? "border-[#f5dbb2] bg-[#fbedd7] text-[#8f6f35]"
+        : "border-[#fbc4c4] bg-[#fde2e2] text-[#9b2c2c]"
 
-function PrediksiHarga() {
-  const [selectedCommodity, setSelectedCommodity] = useState<
-    "all" | CommodityKey
-  >("all")
-  const [rangeDays, setRangeDays] = useState<30 | 60 | 90>(90)
-  const [activeTab, setActiveTab] = useState("chart")
-  const [hoveredPoint, setHoveredPoint] = useState<
-    (typeof forecastData)[0] | null
-  >(null)
-  const [hoverX, setHoverX] = useState<number | null>(null)
+  return (
+    <Badge variant="outline" className={`rounded-md px-2 py-0.5 ${tone}`}>
+      Risiko {risk}
+    </Badge>
+  )
+}
 
-  // Legend toggle visibility
-  const [visibleCommodities, setVisibleCommodities] = useState<
-    Record<CommodityKey, boolean>
-  >({
-    padi: true,
-    jagung: true,
-    cabai: true,
-    bawang: true,
-    tebu: true,
-  })
+function TrendIcon({ trend }: { trend: ForecastResponse["trend"] }) {
+  if (trend === "turun") return <TrendingDown className="size-4" />
+  return <TrendingUp className="size-4" />
+}
 
+function ForecastChart({
+  forecast,
+  commodity,
+}: {
+  forecast: ForecastPoint[]
+  commodity: Commodity
+}) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const [hovered, setHovered] = useState<ForecastPoint | null>(null)
 
-  // Filtered range data
-  const rangeData = useMemo(() => {
-    return forecastData.slice(0, rangeDays)
-  }, [rangeDays])
+  const width = 920
+  const height = 360
+  const pad = { left: 72, right: 28, top: 28, bottom: 42 }
+  const values = forecast.flatMap((point) => [
+    point.harga_lower,
+    point.harga_upper,
+    point.harga_pred,
+  ])
+  const minValue = Math.min(...values)
+  const maxValue = Math.max(...values)
+  const padding = (maxValue - minValue) * 0.12 || 1
+  const yMin = Math.max(0, minValue - padding)
+  const yMax = maxValue + padding
+  const chartWidth = width - pad.left - pad.right
+  const chartHeight = height - pad.top - pad.bottom
+  const color = COMMODITY_COLORS[commodity]
 
-  // Get active lines based on selection & toggles
-  const activeCommodities = useMemo(() => {
-    if (selectedCommodity === "all") {
-      return (Object.keys(commoditiesConfig) as CommodityKey[]).filter(
-        (k) => visibleCommodities[k],
-      )
-    }
-    return [selectedCommodity]
-  }, [selectedCommodity, visibleCommodities])
+  const scaleX = (index: number) =>
+    pad.left + (index / Math.max(1, forecast.length - 1)) * chartWidth
+  const scaleY = (value: number) =>
+    pad.top + (1 - (value - yMin) / Math.max(1, yMax - yMin)) * chartHeight
 
-  // Find min/max values in range to scale the Y-axis properly
-  const yBounds = useMemo(() => {
-    let min = Infinity
-    let max = -Infinity
+  const linePath = forecast
+    .map(
+      (point, index) =>
+        `${index === 0 ? "M" : "L"} ${scaleX(index)} ${scaleY(point.harga_pred)}`,
+    )
+    .join(" ")
 
-    for (const point of rangeData) {
-      for (const comm of activeCommodities) {
-        const val = point[comm]
-        if (val < min) min = val
-        if (val > max) max = val
-      }
-    }
+  const bandPath = [
+    ...forecast.map(
+      (point, index) => `${index === 0 ? "M" : "L"} ${scaleX(index)} ${scaleY(point.harga_upper)}`,
+    ),
+    ...forecast
+      .map((point, index) => `L ${scaleX(index)} ${scaleY(point.harga_lower)}`)
+      .reverse(),
+    "Z",
+  ].join(" ")
 
-    // Add 10% buffer
-    const range = max - min
-    return {
-      min: Math.max(0, min - range * 0.1),
-      max: max + range * 0.1,
-    }
-  }, [rangeData, activeCommodities])
+  const firstExtraIndex = forecast.findIndex((point) => point.status === "ekstrapolasi")
+  const lastPastIndex = forecast.reduce(
+    (lastIndex, point, index) => (point.sudah_lewat ? index : lastIndex),
+    -1,
+  )
+  const todayX = lastPastIndex >= 0 ? scaleX(lastPastIndex) : null
 
-  // SVG dimensions
-  const svgWidth = 800
-  const svgHeight = 350
-  const paddingLeft = 60
-  const paddingRight = 30
-  const paddingTop = 20
-  const paddingBottom = 40
-
-  const scaleX = (index: number) => {
-    const chartWidth = svgWidth - paddingLeft - paddingRight
-    return paddingLeft + (index / (rangeDays - 1)) * chartWidth
-  }
-
-  const scaleY = (value: number) => {
-    const chartHeight = svgHeight - paddingTop - paddingBottom
-    const yRatio = (value - yBounds.min) / (yBounds.max - yBounds.min)
-    return svgHeight - paddingBottom - yRatio * chartHeight
-  }
-
-  const handleMouseMove = (e: React.MouseEvent<SVGSVGElement>) => {
+  const handleMouseMove = (event: React.MouseEvent<SVGSVGElement>) => {
     if (!svgRef.current) return
     const rect = svgRef.current.getBoundingClientRect()
-    const clientX = e.clientX - rect.left
-
-    // Map clientX back to index
-    const chartWidth =
-      rect.width * ((svgWidth - paddingLeft - paddingRight) / svgWidth)
-    const chartStart = rect.width * (paddingLeft / svgWidth)
-
-    const percentage = (clientX - chartStart) / chartWidth
-    const rawIndex = percentage * (rangeDays - 1)
-    const index = Math.max(0, Math.min(rangeDays - 1, Math.round(rawIndex)))
-
-    const point = rangeData[index]
-    setHoveredPoint(point)
-    setHoverX(scaleX(index))
-  }
-
-  const handleMouseLeave = () => {
-    setHoveredPoint(null)
-    setHoverX(null)
-  }
-
-  const toggleVisibility = (key: CommodityKey) => {
-    setVisibleCommodities((prev) => ({
-      ...prev,
-      [key]: !prev[key],
-    }))
-  }
-
-  const handleExport = () => {
-    const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(rangeData, null, 2))}`
-    const downloadAnchor = document.createElement("a")
-    downloadAnchor.setAttribute("href", dataStr)
-    downloadAnchor.setAttribute(
-      "download",
-      `Prediksi_Harga_${rangeDays}_Hari.json`,
+    const ratio = (event.clientX - rect.left) / rect.width
+    const index = Math.max(
+      0,
+      Math.min(forecast.length - 1, Math.round(ratio * (forecast.length - 1))),
     )
-    document.body.appendChild(downloadAnchor)
-    downloadAnchor.click()
-    document.body.removeChild(downloadAnchor)
-    toast.success("File JSON prediksi harga berhasil diunduh!")
-  }
-
-  // Generate SVG Line Paths
-  const renderLines = () => {
-    return activeCommodities.map((comm) => {
-      const config = commoditiesConfig[comm]
-      const points = rangeData
-        .map((d, i) => `${scaleX(i)},${scaleY(d[comm])}`)
-        .join(" ")
-      return (
-        <polyline
-          key={comm}
-          fill="none"
-          stroke={config.color}
-          strokeWidth="2.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          points={points}
-          className="transition-all duration-300"
-        />
-      )
-    })
+    setHovered(forecast[index])
   }
 
   return (
-    <div className="space-y-4">
-      {/* Toolbar Controls */}
-      <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-        <CardContent className="p-4 flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div className="flex flex-wrap items-center gap-3">
-            {/* Commodity filter selector */}
-            <Select
-              value={selectedCommodity}
-              onValueChange={(val) =>
-                setSelectedCommodity(val as "all" | CommodityKey)
-              }
+    <div className="relative rounded-[18px] border border-[#efe4d3] bg-[#fffefb] p-3">
+      <svg
+        ref={svgRef}
+        viewBox={`0 0 ${width} ${height}`}
+        className="h-auto w-full cursor-crosshair select-none"
+        role="img"
+        aria-label="Grafik prediksi harga dengan pita confidence interval"
+        onMouseMove={handleMouseMove}
+        onMouseLeave={() => setHovered(null)}
+      >
+        {[0, 0.25, 0.5, 0.75, 1].map((ratio) => {
+          const value = yMin + ratio * (yMax - yMin)
+          const y = scaleY(value)
+          return (
+            <g key={ratio}>
+              <line
+                x1={pad.left}
+                x2={width - pad.right}
+                y1={y}
+                y2={y}
+                stroke="#eee2d1"
+                strokeDasharray="4 7"
+              />
+              <text
+                x={pad.left - 10}
+                y={y + 4}
+                textAnchor="end"
+                className="fill-[#8d8478] text-[10px] font-semibold"
+              >
+                {Math.round(value).toLocaleString("id-ID")}
+              </text>
+            </g>
+          )
+        })}
+        {lastPastIndex > 0 ? (
+          <rect
+            x={pad.left}
+            y={pad.top}
+            width={Math.max(0, scaleX(lastPastIndex) - pad.left)}
+            height={chartHeight}
+            fill="#efe3cd"
+            opacity="0.32"
+          />
+        ) : null}
+        <path d={bandPath} fill={color} opacity="0.18" />
+        <path d={linePath} fill="none" stroke={color} strokeWidth="3" strokeLinecap="round" />
+        {firstExtraIndex > 0 ? (
+          <path
+            d={forecast
+              .slice(firstExtraIndex)
+              .map(
+                (point, index) =>
+                  `${index === 0 ? "M" : "L"} ${scaleX(index + firstExtraIndex)} ${scaleY(point.harga_pred)}`,
+              )
+              .join(" ")}
+            fill="none"
+            stroke={color}
+            strokeWidth="3.5"
+            strokeDasharray="9 8"
+            strokeLinecap="round"
+            opacity="0.74"
+          />
+        ) : null}
+        {todayX ? (
+          <g>
+            <line
+              x1={todayX}
+              x2={todayX}
+              y1={pad.top}
+              y2={height - pad.bottom}
+              stroke="#8f7654"
+              strokeDasharray="4 6"
+            />
+            <text
+              x={todayX}
+              y={pad.top - 8}
+              textAnchor="middle"
+              className="fill-[#8f7654] text-[10px] font-bold"
             >
-              <SelectTrigger className="h-10 w-[180px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
-                <SelectValue placeholder="Pilih Komoditas" />
-              </SelectTrigger>
-              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
-                <SelectGroup>
-                  <SelectItem value="all" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Semua Komoditas</SelectItem>
-                  <SelectItem value="padi" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Padi Sawah</SelectItem>
-                  <SelectItem value="jagung" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Jagung</SelectItem>
-                  <SelectItem value="cabai" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Cabai Merah</SelectItem>
-                  <SelectItem value="bawang" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Bawang Merah</SelectItem>
-                  <SelectItem value="tebu" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">Tebu</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-
-            {/* Range selection */}
-            <Select
-              value={String(rangeDays)}
-              onValueChange={(val) => setRangeDays(Number(val) as 30 | 60 | 90)}
+              hari ini
+            </text>
+          </g>
+        ) : null}
+        {forecast.map((point, index) => {
+          if (index % 12 !== 0 && index !== forecast.length - 1) return null
+          return (
+            <text
+              key={point.tanggal}
+              x={scaleX(index)}
+              y={height - 18}
+              textAnchor="middle"
+              className="fill-[#8d8478] text-[10px] font-semibold"
             >
-              <SelectTrigger className="h-10 w-[140px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none data-[placeholder]:text-[#6f7d70] [&_svg]:text-[#24473b]">
-                <SelectValue placeholder="Jangka Waktu" />
-              </SelectTrigger>
-              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b] shadow-[0_12px_30px_rgba(74,98,79,0.12)]">
-                <SelectGroup>
-                  <SelectItem value="30" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">30 Hari</SelectItem>
-                  <SelectItem value="60" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">60 Hari</SelectItem>
-                  <SelectItem value="90" className="rounded-xl text-[#24473b] focus:bg-[#e7efe7] focus:text-[#17352b]">90 Hari</SelectItem>
-                </SelectGroup>
-              </SelectContent>
-            </Select>
-
-            {/* Legend Toggles Dropdown (only visible when all commodities are selected) */}
-            {selectedCommodity === "all" && (
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="h-10 rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs font-semibold text-[#6c655a] shadow-none hover:bg-[#fffcf7] gap-2"
-                  >
-                    <Sliders className="size-3.5 text-[#8d8478]" />
-                    <span>Filter Tampilan</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="w-[180px] rounded-xl border-[#eadfcf] bg-white p-1.5 shadow-md">
-                  <DropdownMenuLabel className="text-[10px] font-bold text-[#8d8478] uppercase px-2 py-1">
-                    Tampilkan Komoditas
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="bg-[#f2eadf]" />
-                  {(Object.keys(commoditiesConfig) as CommodityKey[]).map(
-                    (comm) => {
-                      const active = visibleCommodities[comm]
-                      const cfg = commoditiesConfig[comm]
-                      return (
-                        <DropdownMenuCheckboxItem
-                          key={comm}
-                          checked={active}
-                          onCheckedChange={() => toggleVisibility(comm)}
-                          className="text-xs font-semibold text-[#163127] rounded-lg pr-2 py-1.5 focus:bg-[#fdfaf5] focus:text-[#163127]"
-                        >
-                          <div className="flex items-center gap-2">
-                            <span
-                              className={`size-1.5 rounded-full ${cfg.bg}`}
-                            />
-                            <span>{cfg.label}</span>
-                          </div>
-                        </DropdownMenuCheckboxItem>
-                      )
-                    },
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            )}
+              {new Date(point.tanggal).toLocaleDateString("id-ID", {
+                day: "numeric",
+                month: "short",
+              })}
+            </text>
+          )
+        })}
+      </svg>
+      {hovered ? (
+        <div className="absolute right-5 top-5 w-[230px] rounded-xl border border-[#eadfcf] bg-white/95 p-3 text-xs shadow-xl backdrop-blur-sm">
+          <div className="mb-1 border-b border-[#f2eadf] pb-1 font-bold text-[#163127]">
+            {new Date(hovered.tanggal).toLocaleDateString("id-ID", {
+              day: "numeric",
+              month: "long",
+              year: "numeric",
+            })}
           </div>
+          <div className="grid gap-1 text-[#6c655a]">
+            <span>Prediksi: {formatCurrency(hovered.harga_pred)}</span>
+            <span>
+              CI: {formatCurrency(hovered.harga_lower)} -{" "}
+              {formatCurrency(hovered.harga_upper)}
+            </span>
+            <span>
+              Status: {hovered.status}
+              {hovered.sudah_lewat ? " (mengisi gap data)" : ""}
+            </span>
+          </div>
+        </div>
+      ) : null}
+      <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-[#6c655a]">
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-5 rounded-full" style={{ backgroundColor: color }} />
+          garis prediksi
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-5 rounded-full opacity-30" style={{ backgroundColor: color }} />
+          confidence interval
+        </span>
+        <span className="flex items-center gap-1.5">
+          <span className="h-2 w-5 rounded-full bg-[#efe3cd]" />
+          tanggal sudah lewat
+        </span>
+        <span>Segmen putus-putus = ekstrapolasi.</span>
+      </div>
+    </div>
+  )
+}
 
-          <div className="flex items-center gap-2">
-            {/* Display Mode Tabs */}
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className="w-auto"
-            >
-              <TabsList className="bg-[#f3ead8] rounded-xl p-0.75 h-9.5">
-                <TabsTrigger
-                  value="chart"
-                  className="rounded-lg text-xs font-semibold px-3 h-8 gap-1.5 data-[state=active]:bg-white data-[state=active]:text-[#163127]"
-                >
+function PrediksiHarga() {
+  const [commodity, setCommodity] = useState<Commodity>("padi")
+  const [activeTab, setActiveTab] = useState("chart")
+  const [forecast, setForecast] = useState<ForecastResponse | null>(null)
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    let active = true
+    setIsLoading(true)
+    setError(null)
+    getForecast(commodity)
+      .then((data) => {
+        if (active) setForecast(data)
+      })
+      .catch((err: Error) => {
+        if (active) setError(err.message)
+      })
+      .finally(() => {
+        if (active) setIsLoading(false)
+      })
+    return () => {
+      active = false
+    }
+  }, [commodity])
+
+  const tableRows = useMemo(
+    () => forecast?.forecast.filter((_, index) => index % 3 === 0) ?? [],
+    [forecast],
+  )
+
+  const handleExport = () => {
+    if (!forecast) return
+    const dataStr = `data:text/json;charset=utf-8,${encodeURIComponent(JSON.stringify(forecast, null, 2))}`
+    const link = document.createElement("a")
+    link.href = dataStr
+    link.download = `Prediksi_Harga_${forecast.komoditas}.json`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    toast.success("Data forecast berhasil diunduh.")
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+        <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex flex-wrap items-center gap-3">
+            <Select value={commodity} onValueChange={(value) => setCommodity(value as Commodity)}>
+              <SelectTrigger className="h-10 w-[190px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none">
+                <SelectValue placeholder="Pilih komoditas" />
+              </SelectTrigger>
+              <SelectContent className="rounded-2xl border-[#d8ccb7] bg-[#fffaf2] text-[#24473b]">
+                <SelectGroup>
+                  {COMMODITIES.map((item) => (
+                    <SelectItem key={item} value={item} className="rounded-xl">
+                      {commodityLabel(item)}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="h-9.5 rounded-xl bg-[#f3ead8] p-0.75">
+                <TabsTrigger value="chart" className="h-8 gap-1.5 rounded-lg px-3 text-xs">
                   <LineChartIcon className="size-3.5" />
-                  <span>Grafik Tren</span>
+                  Grafik
                 </TabsTrigger>
-                <TabsTrigger
-                  value="table"
-                  className="rounded-lg text-xs font-semibold px-3 h-8 gap-1.5 data-[state=active]:bg-white data-[state=active]:text-[#163127]"
-                >
+                <TabsTrigger value="table" className="h-8 gap-1.5 rounded-lg px-3 text-xs">
                   <TableIcon className="size-3.5" />
-                  <span>Tabel Angka</span>
+                  Tabel
                 </TabsTrigger>
               </TabsList>
             </Tabs>
-
-            {/* Action Buttons */}
-            <Button
-              variant="outline"
-              onClick={handleExport}
-              className="h-9.5 rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs font-semibold text-[#6c655a] shadow-none hover:bg-[#fffcf7] gap-2"
-            >
-              <Download className="size-4" />
-              <span>Ekspor Data</span>
-            </Button>
           </div>
+          <Button
+            variant="outline"
+            onClick={handleExport}
+            disabled={!forecast}
+            className="h-10 gap-2 rounded-xl border-[#e5dacb] bg-[#fffdfa] text-xs"
+          >
+            <Download className="size-4" />
+            Ekspor JSON
+          </Button>
         </CardContent>
       </Card>
 
-      {/* Main Content Area */}
-      <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm overflow-hidden">
-        <CardContent className="p-4 md:p-6">
-          {activeTab === "chart" ? (
-            <div className="space-y-4">
-              {/* Responsive SVG Chart */}
-              <div className="relative w-full">
-                <svg
-                  ref={svgRef}
-                  viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-                  className="w-full h-auto cursor-crosshair overflow-visible select-none"
-                  onMouseMove={handleMouseMove}
-                  onMouseLeave={handleMouseLeave}
-                >
-                  <title>Grafik Tren Prediksi Harga Komoditas</title>
-                  {/* Grid Lines */}
-                  {Array.from({ length: 5 }).map((_, i) => {
-                    const value =
-                      yBounds.min + (i / 4) * (yBounds.max - yBounds.min)
-                    const y = scaleY(value)
-                    return (
-                      <g key={i}>
-                        <line
-                          x1={paddingLeft}
-                          y1={y}
-                          x2={svgWidth - paddingRight}
-                          y2={y}
-                          stroke="#eee2d1"
-                          strokeDasharray="4 6"
-                        />
-                        <text
-                          x={paddingLeft - 8}
-                          y={y + 4}
-                          textAnchor="end"
-                          className="text-[9px] font-semibold fill-[#8d8478]"
-                        >
-                          {Math.round(value).toLocaleString("id-ID")}
-                        </text>
-                      </g>
-                    )
-                  })}
+      {error ? (
+        <Alert className="rounded-[18px] border-[#fbc4c4] bg-[#fff7f7]">
+          <AlertTriangle className="size-4" />
+          <AlertTitle>Forecast belum bisa dimuat</AlertTitle>
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      ) : null}
 
-                  {/* Date Grid Lines (X-Axis markers) */}
-                  {[0, 0.25, 0.5, 0.75, 1].map((ratio, i) => {
-                    const idx = Math.round(ratio * (rangeDays - 1))
-                    const x = scaleX(idx)
-                    const point = rangeData[idx]
-                    if (!point) return null
-                    return (
-                      <g key={i}>
-                        <line
-                          x1={x}
-                          y1={paddingTop}
-                          x2={x}
-                          y2={svgHeight - paddingBottom}
-                          stroke="#eee2d1"
-                          strokeWidth="0.8"
-                        />
-                        <text
-                          x={x}
-                          y={svgHeight - paddingBottom + 16}
-                          textAnchor="middle"
-                          className="text-[9px] font-semibold fill-[#8d8478]"
-                        >
-                          {point.dateStr}
-                        </text>
-                      </g>
-                    )
-                  })}
-
-                  {/* Render Lines */}
-                  {renderLines()}
-
-                  {/* Vertical Hover Tracker Line */}
-                  {hoverX !== null && (
-                    <line
-                      x1={hoverX}
-                      y1={paddingTop}
-                      x2={hoverX}
-                      y2={svgHeight - paddingBottom}
-                      stroke="#8f7654"
-                      strokeWidth="1.5"
-                      strokeDasharray="2 3"
-                    />
-                  )}
-
-                  {/* Hover Points Highlight Circle */}
-                  {hoveredPoint &&
-                    activeCommodities.map((comm) => {
-                      const config = commoditiesConfig[comm]
-                      const x = scaleX(hoveredPoint.index)
-                      const y = scaleY(hoveredPoint[comm])
-                      return (
-                        <circle
-                          key={comm}
-                          cx={x}
-                          cy={y}
-                          r="5.5"
-                          fill={config.color}
-                          stroke="#ffffff"
-                          strokeWidth="2"
-                          className="shadow-md"
-                        />
-                      )
-                    })}
-                </svg>
-
-                {/* Floating Interactive Tooltip */}
-                {hoveredPoint && hoverX !== null && (
-                  <div
-                    className="absolute z-10 bg-[#fffdfb] border border-[#eadfcf] rounded-xl p-3 shadow-xl w-[220px]"
-                    style={{
-                      left:
-                        hoverX > svgWidth / 2
-                          ? `${(hoverX / svgWidth) * 100 - 32}%`
-                          : `${(hoverX / svgWidth) * 100 + 4}%`,
-                      top: "12%",
-                    }}
-                  >
-                    <div className="text-[10px] font-bold text-[#8d8478] mb-1.5 border-b border-[#f2eadf] pb-1">
-                      {hoveredPoint.dateFull}
-                    </div>
-                    <div className="space-y-1.5">
-                      {activeCommodities.map((comm) => {
-                        const cfg = commoditiesConfig[comm]
-                        return (
-                          <div
-                            key={comm}
-                            className="flex items-center justify-between text-xs"
-                          >
-                            <div className="flex items-center gap-1.5">
-                              <span
-                                className={`size-2 rounded-full ${cfg.bg}`}
-                              />
-                              <span className="font-medium text-[#6c655a]">
-                                {cfg.label}
-                              </span>
-                            </div>
-                            <span className="font-bold text-[#163127]">
-                              Rp {hoveredPoint[comm].toLocaleString("id-ID")}
-                            </span>
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
+      {forecast ? (
+        <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
+          <CardHeader className="gap-2">
+            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 font-[Fraunces] text-xl text-[#1d3429]">
+                  <TrendIcon trend={forecast.trend} />
+                  {commodityLabel(forecast.komoditas)}
+                </CardTitle>
+                <CardDescription className="mt-1 text-sm text-[#6c655a]">
+                  {forecast.ringkasan}
+                </CardDescription>
               </div>
-
-              {/* Legend & Instructions */}
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-3 pt-3 border-t border-[#f2eadf] text-[10px] text-[#8c8273]">
-                <div className="flex flex-wrap items-center gap-3.5">
-                  {(Object.keys(commoditiesConfig) as CommodityKey[]).map(
-                    (comm) => {
-                      const cfg = commoditiesConfig[comm]
-                      return (
-                        <div key={comm} className="flex items-center gap-1.5">
-                          <span className={`size-2.5 rounded-full ${cfg.bg}`} />
-                          <span className="font-semibold text-[#3b352a]">
-                            {cfg.label}
-                          </span>
-                        </div>
-                      )
-                    },
-                  )}
-                </div>
-                <div className="flex items-center gap-1">
-                  <HelpCircle className="size-3.5" />
-                  <span>
-                    Arahkan kursor ke grafik untuk memantau harga harian
-                    spesifik.
-                  </span>
-                </div>
+              <div className="flex flex-wrap gap-2">
+                <RiskBadge risk={forecast.kelas_risiko} />
+                <Badge variant="outline" className="rounded-md">
+                  Data per {forecast.data_terakhir}
+                </Badge>
+                <Badge variant="outline" className="rounded-md">
+                  Forecast s/d {forecast.forecast_menjangkau}
+                </Badge>
               </div>
             </div>
-          ) : (
-            /* Forecast Data Table View */
-            <div className="overflow-x-auto">
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-[#efe4d3]">
-                    <TableHead className="font-bold text-[#3c3529]">
-                      Tanggal
-                    </TableHead>
-                    {activeCommodities.includes("padi") && (
-                      <TableHead className="font-bold text-[#3c3529]">
-                        Padi Sawah
-                      </TableHead>
-                    )}
-                    {activeCommodities.includes("jagung") && (
-                      <TableHead className="font-bold text-[#3c3529]">
-                        Jagung
-                      </TableHead>
-                    )}
-                    {activeCommodities.includes("cabai") && (
-                      <TableHead className="font-bold text-[#3c3529]">
-                        Cabai Merah
-                      </TableHead>
-                    )}
-                    {activeCommodities.includes("bawang") && (
-                      <TableHead className="font-bold text-[#3c3529]">
-                        Bawang Merah
-                      </TableHead>
-                    )}
-                    {activeCommodities.includes("tebu") && (
-                      <TableHead className="font-bold text-[#3c3529]">
-                        Tebu
-                      </TableHead>
-                    )}
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {rangeData
-                    .filter((_, idx) => idx % 3 === 0)
-                    .map(
-                      (
-                        row, // Show every 3rd day to avoid too long table
-                      ) => (
-                        <TableRow
-                          key={row.index}
-                          className="border-[#f3ebd6]/60 hover:bg-[#fffefb]"
-                        >
-                          <TableCell className="font-semibold text-xs text-[#163127]">
-                            {row.dateFull}
-                          </TableCell>
-                          {activeCommodities.includes("padi") && (
-                            <TableCell className="text-xs">
-                              Rp {row.padi.toLocaleString("id-ID")}
-                            </TableCell>
-                          )}
-                          {activeCommodities.includes("jagung") && (
-                            <TableCell className="text-xs">
-                              Rp {row.jagung.toLocaleString("id-ID")}
-                            </TableCell>
-                          )}
-                          {activeCommodities.includes("cabai") && (
-                            <TableCell className="text-xs font-semibold text-[#e7644c]">
-                              Rp {row.cabai.toLocaleString("id-ID")}
-                            </TableCell>
-                          )}
-                          {activeCommodities.includes("bawang") && (
-                            <TableCell className="text-xs">
-                              Rp {row.bawang.toLocaleString("id-ID")}
-                            </TableCell>
-                          )}
-                          {activeCommodities.includes("tebu") && (
-                            <TableCell className="text-xs">
-                              Rp {row.tebu.toLocaleString("id-ID")}
-                            </TableCell>
-                          )}
-                        </TableRow>
-                      ),
-                    )}
-                </TableBody>
-              </Table>
+          </CardHeader>
+          <CardContent className="flex flex-col gap-4">
+            {forecast.catatan_ekstrapolasi ? (
+              <Alert className="rounded-[16px] border-[#f5dbb2] bg-[#fffaf2]">
+                <AlertTriangle className="size-4" />
+                <AlertTitle>Bagian grafik bersifat indikatif</AlertTitle>
+                <AlertDescription>{forecast.catatan_ekstrapolasi}</AlertDescription>
+              </Alert>
+            ) : null}
+            {activeTab === "chart" ? (
+              <ForecastChart forecast={forecast.forecast} commodity={forecast.komoditas} />
+            ) : (
+              <div className="overflow-x-auto rounded-[18px] border border-[#efe4d3]">
+                <Table>
+                  <TableHeader className="bg-[#fffbf4]">
+                    <TableRow>
+                      <TableHead>Tanggal</TableHead>
+                      <TableHead>Prediksi</TableHead>
+                      <TableHead>Confidence interval</TableHead>
+                      <TableHead>Status</TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {tableRows.map((point) => (
+                      <TableRow key={point.tanggal}>
+                        <TableCell className="font-medium">
+                          {new Date(point.tanggal).toLocaleDateString("id-ID", {
+                            day: "numeric",
+                            month: "long",
+                            year: "numeric",
+                          })}
+                        </TableCell>
+                        <TableCell>{formatCurrency(point.harga_pred)}</TableCell>
+                        <TableCell>
+                          {formatCurrency(point.harga_lower)} -{" "}
+                          {formatCurrency(point.harga_upper)}
+                        </TableCell>
+                        <TableCell>
+                          <Badge variant="outline" className="rounded-md">
+                            {point.status}
+                            {point.sudah_lewat ? " / sudah lewat" : ""}
+                          </Badge>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                  </TableBody>
+                </Table>
+              </div>
+            )}
+            <div className="grid gap-2 rounded-[16px] border border-[#efe4d3] bg-[#fffdf9] p-3 text-xs text-[#6c655a] md:grid-cols-3">
+              <div>
+                <span className="font-semibold text-[#163127]">Model:</span>{" "}
+                {forecast.model_menang ?? "-"}
+              </div>
+              <div>
+                <span className="font-semibold text-[#163127]">MAE:</span>{" "}
+                {forecast.mae_model ?? "-"} vs baseline{" "}
+                {forecast.mae_naive_baseline ?? "-"}
+              </div>
+              <div>
+                <span className="font-semibold text-[#163127]">Aturan:</span>{" "}
+                {forecast.aturan_seleksi ?? "-"}
+              </div>
             </div>
-          )}
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : isLoading ? (
+        <Card className="rounded-[20px] border-[#eadfcf] bg-white p-6 text-sm text-[#6c655a]">
+          Memuat forecast harga...
+        </Card>
+      ) : null}
     </div>
   )
 }

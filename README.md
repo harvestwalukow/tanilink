@@ -29,9 +29,41 @@ Before sharing or deploying, update at least:
 
 ### 2. Start the stack
 
-```bash
-docker compose watch
+On Windows PowerShell, use the local helper script. It disables Docker
+Compose's interactive console UI, builds the local images when needed, and
+starts the stack detached:
+
+```powershell
+.\scripts\docker-up-local.ps1
 ```
+
+Equivalent manual command:
+
+```powershell
+$env:COMPOSE_MENU="false"
+$env:COMPOSE_PROGRESS="plain"
+$env:CI="true"
+docker compose --ansi never --progress plain up --build --pull never -d
+```
+
+Do not use `docker compose watch` for the first startup on Windows. It can fail
+with `failed to get console: creating a console from a file is not supported on
+windows`.
+
+In local Docker, the frontend runs through Vite and the backend runs with
+FastAPI reload. Normal code edits should refresh automatically; use `Ctrl+F5`
+in the browser if Chrome keeps an old bundle cached.
+
+After the first successful startup, you can start and stop the existing
+containers without rebuilding:
+
+```powershell
+docker compose start
+docker compose stop
+```
+
+Run `.\scripts\docker-up-local.ps1` again after dependency changes, `.env`
+changes, Dockerfile/Compose changes, or if containers/images were removed.
 
 Available local services:
 
@@ -46,7 +78,8 @@ The first startup may take a minute while the database, backend setup, and front
 
 ### 3. Frontend-only local development
 
-For faster frontend iteration, stop the frontend container and run Vite directly:
+The Docker stack already runs Vite with hot refresh. If you prefer running Vite
+directly on Windows instead:
 
 ```bash
 docker compose stop frontend

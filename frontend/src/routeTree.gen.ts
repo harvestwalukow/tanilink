@@ -15,7 +15,6 @@ import { Route as RecoverPasswordRouteImport } from './routes/recover-password'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as LayoutRouteImport } from './routes/_layout'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as LayoutSettingsRouteImport } from './routes/_layout/settings'
 import { Route as LayoutRekomendasiTanamRouteImport } from './routes/_layout/rekomendasi-tanam'
 import { Route as LayoutPrediksiHargaRouteImport } from './routes/_layout/prediksi-harga'
 import { Route as LayoutPetaWilayahRouteImport } from './routes/_layout/peta-wilayah'
@@ -52,11 +51,6 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
-} as any)
-const LayoutSettingsRoute = LayoutSettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => LayoutRoute,
 } as any)
 const LayoutRekomendasiTanamRoute = LayoutRekomendasiTanamRouteImport.update({
   id: '/rekomendasi-tanam',
@@ -107,7 +101,6 @@ export interface FileRoutesByFullPath {
   '/peta-wilayah': typeof LayoutPetaWilayahRoute
   '/prediksi-harga': typeof LayoutPrediksiHargaRoute
   '/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
-  '/settings': typeof LayoutSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -122,7 +115,6 @@ export interface FileRoutesByTo {
   '/peta-wilayah': typeof LayoutPetaWilayahRoute
   '/prediksi-harga': typeof LayoutPrediksiHargaRoute
   '/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
-  '/settings': typeof LayoutSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -139,7 +131,6 @@ export interface FileRoutesById {
   '/_layout/peta-wilayah': typeof LayoutPetaWilayahRoute
   '/_layout/prediksi-harga': typeof LayoutPrediksiHargaRoute
   '/_layout/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
-  '/_layout/settings': typeof LayoutSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -156,7 +147,6 @@ export interface FileRouteTypes {
     | '/peta-wilayah'
     | '/prediksi-harga'
     | '/rekomendasi-tanam'
-    | '/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -171,7 +161,6 @@ export interface FileRouteTypes {
     | '/peta-wilayah'
     | '/prediksi-harga'
     | '/rekomendasi-tanam'
-    | '/settings'
   id:
     | '__root__'
     | '/'
@@ -187,7 +176,6 @@ export interface FileRouteTypes {
     | '/_layout/peta-wilayah'
     | '/_layout/prediksi-harga'
     | '/_layout/rekomendasi-tanam'
-    | '/_layout/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -242,13 +230,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
-    }
-    '/_layout/settings': {
-      id: '/_layout/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof LayoutSettingsRouteImport
-      parentRoute: typeof LayoutRoute
     }
     '/_layout/rekomendasi-tanam': {
       id: '/_layout/rekomendasi-tanam'
@@ -310,7 +291,6 @@ interface LayoutRouteChildren {
   LayoutPetaWilayahRoute: typeof LayoutPetaWilayahRoute
   LayoutPrediksiHargaRoute: typeof LayoutPrediksiHargaRoute
   LayoutRekomendasiTanamRoute: typeof LayoutRekomendasiTanamRoute
-  LayoutSettingsRoute: typeof LayoutSettingsRoute
 }
 
 const LayoutRouteChildren: LayoutRouteChildren = {
@@ -321,7 +301,6 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutPetaWilayahRoute: LayoutPetaWilayahRoute,
   LayoutPrediksiHargaRoute: LayoutPrediksiHargaRoute,
   LayoutRekomendasiTanamRoute: LayoutRekomendasiTanamRoute,
-  LayoutSettingsRoute: LayoutSettingsRoute,
 }
 
 const LayoutRouteWithChildren =

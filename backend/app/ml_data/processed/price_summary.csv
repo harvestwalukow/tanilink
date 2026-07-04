@@ -1,0 +1,8 @@
+komoditas,model_menang,model_mae_terbaik,aturan_seleksi,harga_terakhir,yhat_titik_90hari,pct_change,trend,shape_amplitude_pct,volatility_annual,ci_width_pct,mae_model_menang,mae_naive,biaya_akurasi_vs_terbaik_pct,origin_data,data_terakhir,forecast_menjangkau,horizon_out,n_folds,n_obs
+bawang_merah,naive_drift,naive,one-SE prefer-informative,54025.0,54677.0,1.21,stabil,1.1,0.451,51.7,4709.6,4704.8,0.1,2026-06-08,June 2026,2026-09-13,13,6,480
+bawang_putih,naive_drift,naive,one-SE prefer-informative,28200.0,28033.0,-0.59,stabil,0.5,0.1096,74.6,1333.6,1327.6,0.45,2026-06-08,June 2026,2026-09-13,13,6,480
+cabai,prophet,prophet,best (informatif juga terbaik),53500.0,31149.0,-41.78,turun,26.5,1.0172,218.2,11490.5,16992.9,0.0,2026-06-08,June 2026,2026-09-13,13,6,480
+padi,naive_drift,naive_drift,best (informatif juga terbaik),14800.0,14941.0,0.95,stabil,0.9,0.0274,6.2,102.9,114.7,0.0,2026-06-08,June 2026,2026-09-13,13,6,480
+tebu,naive_drift,naive,one-SE prefer-informative,18500.0,18564.0,0.34,stabil,0.3,0.0256,11.1,220.4,215.4,2.34,2026-06-08,June 2026,2026-09-13,13,6,480
+jagung,naive_drift,naive_drift,best (informatif juga terbaik),6020.0,6083.0,1.06,stabil,0.7,0.2802,30.8,168.1,179.2,0.0,2025-12-01,December 2025,2026-10-01,10,5,72
+kedelai,naive,naive,best (informatif melebihi pagar biaya-akurasi -> datar tapi jujur),8000.0,8000.0,0.0,stabil,0.0,0.1652,29.3,299.4,299.4,0.0,2025-12-01,December 2025,2026-10-01,10,5,72

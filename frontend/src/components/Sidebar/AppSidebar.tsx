@@ -1,9 +1,6 @@
 import {
   BarChart3,
-  Home,
   Landmark,
-  Map as MapIcon,
-  Settings,
   Sprout,
 } from "lucide-react"
 
@@ -18,12 +15,9 @@ import {
 import { type Item, Main } from "./Main"
 
 const baseItems: Item[] = [
-  { icon: Home, title: "Beranda", path: "/app" },
-  { icon: Sprout, title: "Kesesuaian Lahan", path: "/kesesuaian-lahan" },
-  { icon: BarChart3, title: "Prediksi Harga", path: "/prediksi-harga" },
   { icon: Landmark, title: "Rekomendasi Tanam", path: "/rekomendasi-tanam" },
-  { icon: MapIcon, title: "Peta & Wilayah", path: "/peta-wilayah" },
-  { icon: Settings, title: "Pengaturan", path: "/settings" },
+  { icon: Sprout, title: "Kecocokan Lahan", path: "/kesesuaian-lahan" },
+  { icon: BarChart3, title: "Prediksi Harga", path: "/prediksi-harga" },
 ]
 
 export function AppSidebar() {
