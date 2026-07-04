@@ -150,7 +150,7 @@ function ForecastChart({
   }
 
   return (
-    <div className="relative rounded-[18px] border border-[#efe4d3] bg-[#fffefb] p-3">
+    <div className="relative rounded-[18px] border border-[#efe4d3] bg-[#fffefb] p-5">
       <svg
         ref={svgRef}
         viewBox={`0 0 ${width} ${height}`}
@@ -273,7 +273,7 @@ function ForecastChart({
           </div>
         </div>
       ) : null}
-      <div className="mt-3 flex flex-wrap items-center gap-3 text-[11px] text-[#6c655a]">
+      <div className="mt-4 flex flex-wrap items-center gap-3 border-t border-[#f4eadb] pt-3 text-[11px] text-[#6c655a]">
         <span className="flex items-center gap-1.5">
           <span className="h-2 w-5 rounded-full" style={{ backgroundColor: color }} />
           garis prediksi
@@ -338,7 +338,7 @@ function PrediksiHarga() {
   return (
     <div className="flex flex-col gap-4">
       <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-        <CardContent className="flex flex-col gap-3 p-4 md:flex-row md:items-center md:justify-between">
+        <CardContent className="flex flex-col gap-4 p-5 md:flex-row md:items-center md:justify-between">
           <div className="flex flex-wrap items-center gap-3">
             <Select value={commodity} onValueChange={(value) => setCommodity(value as Commodity)}>
               <SelectTrigger className="h-10 w-[190px] rounded-xl border-[#d8ccb7] bg-[#f7f2e8] text-xs text-[#24473b] shadow-none">
@@ -389,8 +389,8 @@ function PrediksiHarga() {
 
       {forecast ? (
         <Card className="rounded-[20px] border-[#eadfcf] bg-white shadow-sm">
-          <CardHeader className="gap-2">
-            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+          <CardHeader className="px-5 pb-3 pt-5">
+            <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
               <div>
                 <CardTitle className="flex items-center gap-2 font-[Fraunces] text-xl text-[#1d3429]">
                   <TrendIcon trend={forecast.trend} />
@@ -400,7 +400,7 @@ function PrediksiHarga() {
                   {forecast.ringkasan}
                 </CardDescription>
               </div>
-              <div className="flex flex-wrap gap-2">
+              <div className="flex flex-wrap gap-2 md:justify-end">
                 <RiskBadge risk={forecast.kelas_risiko} />
                 <Badge variant="outline" className="rounded-md">
                   Data per {forecast.data_terakhir}
@@ -411,7 +411,7 @@ function PrediksiHarga() {
               </div>
             </div>
           </CardHeader>
-          <CardContent className="flex flex-col gap-4">
+          <CardContent className="flex flex-col gap-4 px-5 pb-5">
             {forecast.catatan_ekstrapolasi ? (
               <Alert className="rounded-[16px] border-[#f5dbb2] bg-[#fffaf2]">
                 <AlertTriangle className="size-4" />
@@ -459,17 +459,17 @@ function PrediksiHarga() {
                 </Table>
               </div>
             )}
-            <div className="grid gap-2 rounded-[16px] border border-[#efe4d3] bg-[#fffdf9] p-3 text-xs text-[#6c655a] md:grid-cols-3">
-              <div>
+            <div className="grid gap-3 rounded-[16px] border border-[#efe4d3] bg-[#fffdf9] p-4 text-xs leading-relaxed text-[#6c655a] md:grid-cols-3">
+              <div className="min-w-0">
                 <span className="font-semibold text-[#163127]">Model:</span>{" "}
                 {forecast.model_menang ?? "-"}
               </div>
-              <div>
+              <div className="min-w-0">
                 <span className="font-semibold text-[#163127]">MAE:</span>{" "}
                 {forecast.mae_model ?? "-"} vs baseline{" "}
                 {forecast.mae_naive_baseline ?? "-"}
               </div>
-              <div>
+              <div className="min-w-0">
                 <span className="font-semibold text-[#163127]">Aturan:</span>{" "}
                 {forecast.aturan_seleksi ?? "-"}
               </div>
