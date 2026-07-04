@@ -29,6 +29,8 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 COPY ./backend/scripts /app/backend/scripts
 
+RUN chmod +x /app/backend/scripts/*.sh
+
 COPY ./backend/pyproject.toml ./backend/alembic.ini /app/backend/
 
 COPY ./backend/app /app/backend/app
@@ -42,4 +44,4 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 
 WORKDIR /app/backend/
 
-CMD ["bash", "-c", "scripts/prestart.sh && fastapi run --workers 4 app/main.py"]
+CMD ["bash", "-c", "bash scripts/prestart.sh && fastapi run --workers 4 app/main.py"]
