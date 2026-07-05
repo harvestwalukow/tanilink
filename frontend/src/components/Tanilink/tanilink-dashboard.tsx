@@ -7,7 +7,13 @@ import {
   TrendingDown,
   TrendingUp,
 } from "lucide-react"
-import { type ReactNode, useEffect, useMemo, useState } from "react"
+import {
+  type MouseEvent as ReactMouseEvent,
+  type ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 import { Badge } from "@/components/ui/badge"
@@ -40,6 +46,11 @@ const COMMODITY_COLORS: Record<Commodity, string> = {
   bawang_merah: "#8f64d8",
 }
 const BRAND_GREEN_ACCENT = "#2f5d50"
+const CHART_WIDTH = 560
+const CHART_HEIGHT = 132
+const CHART_TOP = 10
+const CHART_BOTTOM = 116
+const CHART_PLOT_HEIGHT = CHART_BOTTOM - CHART_TOP
 
 function scoreClass(value: number) {
   if (value >= 0.75) return "Sangat Sesuai"
@@ -66,6 +77,13 @@ function sourceBadge(source: string) {
     label: "Keandalan tinggi",
     className: "border-[#cce0b8] bg-[#e5efda] text-[#4d6839]",
   }
+}
+
+function formatShortDate(date: string) {
+  return new Intl.DateTimeFormat("id-ID", {
+    day: "numeric",
+    month: "short",
+  }).format(new Date(date))
 }
 
 function ScoreBar({
@@ -163,17 +181,12 @@ function SuitabilityPanel({ item }: { item: Recommendation | null }) {
     )
   }
 
-  const color = COMMODITY_COLORS[item.komoditas]
   const badge = sourceBadge(item.sumber_suitability)
-  const interval =
-    item.suitability_lo != null && item.suitability_hi != null
-      ? `${formatPercent(item.suitability_lo)} - ${formatPercent(item.suitability_hi)}`
-      : "-"
 
   return (
     <PanelFrame title="Kecocokan Lahan" icon={Sprout}>
-      <div className="grid gap-4 lg:grid-cols-[0.85fr_1.15fr]">
-        <div className="rounded-[18px] border border-[#eadfcf] bg-[#fffefb] p-5">
+      <div className="grid items-center gap-5 rounded-[18px] border border-[#eadfcf] bg-[#fffefb] p-5 sm:grid-cols-[1fr_auto]">
+        <div>
           <div className="text-sm text-[#6c655a]">Komoditas dipilih</div>
           <div className="mt-2 font-[Fraunces] text-3xl leading-tight text-[#163127]">
             {commodityLabel(item.komoditas)}
@@ -189,29 +202,12 @@ function SuitabilityPanel({ item }: { item: Recommendation | null }) {
               {badge.label}
             </Badge>
           </div>
-          <div className="mt-5">
-            <div className="font-[Fraunces] text-5xl leading-none text-[#163127]">
-              {formatPercent(item.suitability_norm)}
-            </div>
-            <div className="mt-1 text-xs text-[#8d8478]">nilai kecocokan</div>
-          </div>
         </div>
-
-        <div className="rounded-[18px] border border-[#eadfcf] bg-white p-5">
-          <div className="mb-2 flex justify-between gap-3 text-sm text-[#6c655a]">
-            <span>Kecocokan lahan</span>
-            <span className="font-semibold text-[#163127]">
-              {formatPercent(item.suitability_norm)}
-            </span>
+        <div className="sm:text-right">
+          <div className="font-[Fraunces] text-5xl leading-none text-[#163127] sm:text-6xl">
+            {formatPercent(item.suitability_norm)}
           </div>
-          <ScoreBar value={item.suitability_norm} color={color} />
-          <div className="mt-2 text-xs text-[#8d8478]">
-            Rentang keyakinan: {interval}
-          </div>
-          <div className="mt-5 border-t border-[#f4eadb] pt-4 text-sm leading-relaxed text-[#6c655a]">
-            <div className="font-semibold text-[#163127]">Sumber model</div>
-            <div className="mt-1">{item.sumber_suitability}</div>
-          </div>
+          <div className="mt-1 text-xs text-[#8d8478]">nilai kecocokan</div>
         </div>
       </div>
     </PanelFrame>
@@ -229,11 +225,55 @@ function PricePanel({
     if (!forecast) return []
     return forecast.forecast.filter((_, index) => index % 6 === 0).slice(0, 12)
   }, [forecast])
+  const [hoverIndex, setHoverIndex] = useState<number | null>(null)
+  const [hoverX, setHoverX] = useState<number | null>(null)
   const values = chartPoints.map((point) => point.harga_pred)
   const min = Math.min(...values)
   const max = Math.max(...values)
   const range = Math.max(1, max - min)
   const latest = chartPoints[chartPoints.length - 1]
+  const lineColor = forecast ? COMMODITY_COLORS[forecast.komoditas] : "#d18a2f"
+  const getChartX = (index: number) =>
+    chartPoints.length > 1
+      ? (index / (chartPoints.length - 1)) * CHART_WIDTH
+      : CHART_WIDTH / 2
+  const getChartY = (price: number) =>
+    CHART_BOTTOM - ((price - min) / range) * CHART_PLOT_HEIGHT
+  const linePath = chartPoints
+    .map((point, index) => {
+      const x = getChartX(index)
+      const y = getChartY(point.harga_pred)
+      return `${index === 0 ? "M" : "L"} ${x} ${y}`
+    })
+    .join(" ")
+  const areaPath =
+    chartPoints.length > 0
+      ? `${linePath} L ${getChartX(chartPoints.length - 1)} ${CHART_BOTTOM} L ${getChartX(0)} ${CHART_BOTTOM} Z`
+      : ""
+  const todayIndex = chartPoints.findIndex((point) => !point.sudah_lewat)
+  const hoverPoint = hoverIndex === null ? null : chartPoints[hoverIndex]
+  const firstPoint = chartPoints[0]
+  const middlePoint = chartPoints[Math.floor(chartPoints.length / 2)]
+
+  const handleChartMouseMove = (
+    event: ReactMouseEvent<SVGSVGElement, MouseEvent>,
+  ) => {
+    if (chartPoints.length === 0) return
+    const rect = event.currentTarget.getBoundingClientRect()
+    const cursorX = event.clientX - rect.left
+    const svgX = (cursorX / rect.width) * CHART_WIDTH
+    const index = Math.min(
+      chartPoints.length - 1,
+      Math.max(0, Math.round((svgX / CHART_WIDTH) * (chartPoints.length - 1))),
+    )
+    setHoverIndex(index)
+    setHoverX(getChartX(index))
+  }
+
+  const handleChartMouseLeave = () => {
+    setHoverIndex(null)
+    setHoverX(null)
+  }
 
   return (
     <PanelFrame title="Prediksi Harga" icon={BarChart3}>
@@ -269,21 +309,138 @@ function PricePanel({
           </div>
 
           <div className="rounded-[18px] border border-[#eadfcf] bg-white p-5">
-            <div className="flex h-40 items-end gap-2">
-              {chartPoints.map((point) => {
-                const height = 22 + ((point.harga_pred - min) / range) * 118
-                return (
-                  <div
+            <div className="relative rounded-[16px] border border-[#efe4d3] bg-[#fffefb] p-3">
+              <div className="mb-2 flex items-center justify-between gap-3 text-xs text-[#71695c]">
+                <div className="flex items-center gap-1.5 font-semibold text-[#163127]">
+                  <span
+                    className="size-2 rounded-full"
+                    style={{ backgroundColor: lineColor }}
+                  />
+                  Harga {commodityLabel(forecast.komoditas)}
+                </div>
+                <span>Rp/kg</span>
+              </div>
+              <svg
+                viewBox={`0 0 ${CHART_WIDTH} ${CHART_HEIGHT}`}
+                className="h-[150px] w-full cursor-crosshair overflow-visible select-none"
+                role="img"
+                aria-labelledby="forecast-price-chart-title"
+                onMouseMove={handleChartMouseMove}
+                onMouseLeave={handleChartMouseLeave}
+              >
+                <title id="forecast-price-chart-title">
+                  Prediksi harga komoditas 90 hari
+                </title>
+                {[
+                  CHART_TOP,
+                  CHART_TOP + CHART_PLOT_HEIGHT / 2,
+                  CHART_BOTTOM,
+                ].map((y) => (
+                  <line
+                    key={y}
+                    x1="0"
+                    y1={y}
+                    x2={CHART_WIDTH}
+                    y2={y}
+                    stroke="#eee2d1"
+                    strokeDasharray="4 7"
+                  />
+                ))}
+                {todayIndex >= 0 ? (
+                  <line
+                    x1={getChartX(todayIndex)}
+                    y1={CHART_TOP}
+                    x2={getChartX(todayIndex)}
+                    y2={CHART_BOTTOM}
+                    stroke="#d8ccb9"
+                    strokeDasharray="4 6"
+                  />
+                ) : null}
+                {areaPath ? (
+                  <path d={areaPath} fill={lineColor} opacity="0.08" />
+                ) : null}
+                <path
+                  d={linePath}
+                  fill="none"
+                  stroke={lineColor}
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="3"
+                />
+                {chartPoints.map((point, index) => (
+                  <circle
                     key={point.tanggal}
-                    className="flex flex-1 flex-col items-center justify-end gap-2"
-                  >
-                    <span
-                      className="w-full rounded-t-lg bg-[#d18a2f]"
-                      style={{ height }}
+                    cx={getChartX(index)}
+                    cy={getChartY(point.harga_pred)}
+                    r={hoverIndex === index ? "4.5" : "2.8"}
+                    fill={lineColor}
+                    stroke="#fff"
+                    strokeWidth="1.6"
+                  />
+                ))}
+                {hoverX !== null && hoverPoint ? (
+                  <>
+                    <line
+                      x1={hoverX}
+                      y1={CHART_TOP}
+                      x2={hoverX}
+                      y2={CHART_BOTTOM}
+                      stroke="#8f7654"
+                      strokeDasharray="2 3"
+                      strokeWidth="1.5"
                     />
+                    <circle
+                      cx={hoverX}
+                      cy={getChartY(hoverPoint.harga_pred)}
+                      r="5"
+                      fill={lineColor}
+                      stroke="#fff"
+                      strokeWidth="2"
+                    />
+                  </>
+                ) : null}
+              </svg>
+              <div className="mt-2 grid grid-cols-3 items-center text-[10px] text-[#93897a]">
+                <span>
+                  {firstPoint ? formatShortDate(firstPoint.tanggal) : "-"}
+                </span>
+                {todayIndex >= 0 ? (
+                  <Badge
+                    variant="outline"
+                    className="mx-auto rounded-full border-[#e6dbc9] bg-[#fffaf2] px-2 py-0 text-[10px] text-[#6b655a]"
+                  >
+                    Hari ini
+                  </Badge>
+                ) : (
+                  <span className="text-center">
+                    {middlePoint ? formatShortDate(middlePoint.tanggal) : "-"}
+                  </span>
+                )}
+                <span className="text-right">
+                  {latest ? formatShortDate(latest.tanggal) : "-"}
+                </span>
+              </div>
+              {hoverX !== null && hoverPoint ? (
+                <div
+                  className="pointer-events-none absolute top-12 z-10 w-[170px] rounded-xl border border-[#eadfcf] bg-white/95 p-3 text-xs text-[#2c3c2d] shadow-md backdrop-blur-sm"
+                  style={{
+                    left:
+                      hoverX > CHART_WIDTH / 2
+                        ? `${(hoverX / CHART_WIDTH) * 100 - 34}%`
+                        : `${(hoverX / CHART_WIDTH) * 100 + 4}%`,
+                  }}
+                >
+                  <div className="mb-1 border-b border-[#f2eadf] pb-1 font-bold text-[#163127]">
+                    {formatShortDate(hoverPoint.tanggal)}
                   </div>
-                )
-              })}
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="text-[#6c655a]">Prediksi</span>
+                    <span className="font-bold text-[#1d3429]">
+                      {formatCurrency(hoverPoint.harga_pred)}
+                    </span>
+                  </div>
+                </div>
+              ) : null}
             </div>
             <div className="mt-4 border-t border-[#f4eadb] pt-3 text-sm leading-relaxed text-[#6c655a]">
               {forecast.ringkasan}
