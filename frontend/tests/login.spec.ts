@@ -3,10 +3,23 @@ import { firstSuperuser, firstSuperuserPassword } from "./config.ts"
 import { randomPassword } from "./utils/random.ts"
 
 test.use({ storageState: { cookies: [], origins: [] } })
+test.describe.configure({ mode: "serial" })
 
 const fillForm = async (page: Page, email: string, password: string) => {
   await page.getByTestId("email-input").fill(email)
   await page.getByTestId("password-input").fill(password)
+}
+
+const openAppAfterOnboarding = async (page: Page) => {
+  await page.evaluate(() => {
+    sessionStorage.setItem("tanilink:onboarding-complete", "true")
+  })
+  await page.goto("/app")
+}
+
+const logOutFromHeader = async (page: Page) => {
+  await page.getByRole("button", { name: firstSuperuser }).click()
+  await page.getByRole("menuitem", { name: "Logout" }).click()
 }
 
 const verifyInput = async (page: Page, testId: string) => {
@@ -26,35 +39,42 @@ test("Inputs are visible, empty and editable", async ({ page }) => {
 test("Log In button is visible", async ({ page }) => {
   await page.goto("/login")
 
-  await expect(page.getByRole("button", { name: "Log In" })).toBeVisible()
+  await expect(page.getByRole("button", { name: "Masuk" })).toBeVisible()
 })
 
 test("Forgot Password link is visible", async ({ page }) => {
   await page.goto("/login")
 
   await expect(
-    page.getByRole("link", { name: "Forgot your password?" }),
+    page.getByRole("link", { name: "Lupa kata sandi?" }),
   ).toBeVisible()
+})
+
+test("Google OAuth button is visible", async ({ page }) => {
+  await page.goto("/login")
+
+  await expect(
+    page.getByText("Lanjutkan dengan Google").first(),
+  ).toBeVisible()
+  await expect(page.getByText("atau")).toBeVisible()
 })
 
 test("Log in with valid email and password ", async ({ page }) => {
   await page.goto("/login")
 
   await fillForm(page, firstSuperuser, firstSuperuserPassword)
-  await page.getByRole("button", { name: "Log In" }).click()
+  await page.getByRole("button", { name: "Masuk" }).click()
 
-  await page.waitForURL("/")
+  await page.waitForURL("/onboarding")
 
-  await expect(
-    page.getByText("Welcome back, nice to see you again!"),
-  ).toBeVisible()
+  await expect(page.getByText("Atur Lokasi & Waktu Tanam")).toBeVisible()
 })
 
 test("Log in with invalid email", async ({ page }) => {
   await page.goto("/login")
 
   await fillForm(page, "invalidemail", firstSuperuserPassword)
-  await page.getByRole("button", { name: "Log In" }).click()
+  await page.getByRole("button", { name: "Masuk" }).click()
 
   await expect(page.getByText("Invalid email address")).toBeVisible()
 })
@@ -64,25 +84,25 @@ test("Log in with invalid password", async ({ page }) => {
 
   await page.goto("/login")
   await fillForm(page, firstSuperuser, password)
-  await page.getByRole("button", { name: "Log In" }).click()
+  await page.getByRole("button", { name: "Masuk" }).click()
 
-  await expect(page.getByText("Incorrect email or password")).toBeVisible()
+  await expect(
+    page.getByRole("listitem").filter({ hasText: "Incorrect email or password" }),
+  ).toBeVisible()
 })
 
 test("Successful log out", async ({ page }) => {
   await page.goto("/login")
 
   await fillForm(page, firstSuperuser, firstSuperuserPassword)
-  await page.getByRole("button", { name: "Log In" }).click()
+  await page.getByRole("button", { name: "Masuk" }).click()
 
-  await page.waitForURL("/")
+  await page.waitForURL("/onboarding")
 
-  await expect(
-    page.getByText("Welcome back, nice to see you again!"),
-  ).toBeVisible()
+  await expect(page.getByText("Atur Lokasi & Waktu Tanam")).toBeVisible()
 
-  await page.getByTestId("user-menu").click()
-  await page.getByRole("menuitem", { name: "Log out" }).click()
+  await openAppAfterOnboarding(page)
+  await logOutFromHeader(page)
   await page.waitForURL("/login")
 })
 
@@ -90,16 +110,14 @@ test("Logged-out user cannot access protected routes", async ({ page }) => {
   await page.goto("/login")
 
   await fillForm(page, firstSuperuser, firstSuperuserPassword)
-  await page.getByRole("button", { name: "Log In" }).click()
+  await page.getByRole("button", { name: "Masuk" }).click()
 
-  await page.waitForURL("/")
+  await page.waitForURL("/onboarding")
 
-  await expect(
-    page.getByText("Welcome back, nice to see you again!"),
-  ).toBeVisible()
+  await expect(page.getByText("Atur Lokasi & Waktu Tanam")).toBeVisible()
 
-  await page.getByTestId("user-menu").click()
-  await page.getByRole("menuitem", { name: "Log out" }).click()
+  await openAppAfterOnboarding(page)
+  await logOutFromHeader(page)
   await page.waitForURL("/login")
 
   await page.goto("/app")

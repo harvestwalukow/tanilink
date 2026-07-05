@@ -12,7 +12,7 @@ export async function signUpNewUser(
   await page.getByTestId("email-input").fill(email)
   await page.getByTestId("password-input").fill(password)
   await page.getByTestId("confirm-password-input").fill(password)
-  await page.getByRole("button", { name: "Sign Up" }).click()
+  await page.getByRole("button", { name: "Daftar" }).click()
   await page.goto("/login")
 }
 
@@ -21,11 +21,9 @@ export async function logInUser(page: Page, email: string, password: string) {
 
   await page.getByTestId("email-input").fill(email)
   await page.getByTestId("password-input").fill(password)
-  await page.getByRole("button", { name: "Log In" }).click()
-  await page.waitForURL("/")
-  await expect(
-    page.getByText("Welcome back, nice to see you again!"),
-  ).toBeVisible()
+  await page.getByRole("button", { name: "Masuk" }).click()
+  await page.waitForURL("/onboarding")
+  await expect(page.getByText("Atur Lokasi & Waktu Tanam")).toBeVisible()
 }
 
 export async function logOutUser(page: Page) {

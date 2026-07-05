@@ -1,8 +1,8 @@
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from fastapi.testclient import TestClient
 from pwdlib.hashers.bcrypt import BcryptHasher
-from sqlmodel import Session
+from sqlmodel import Session, select
 
 from app.core.config import settings
 from app.core.security import get_password_hash, verify_password
@@ -32,6 +32,95 @@ def test_get_access_token_incorrect_password(client: TestClient) -> None:
     }
     r = client.post(f"{settings.API_V1_STR}/login/access-token", data=login_data)
     assert r.status_code == 400
+
+
+def test_google_login_creates_user(client: TestClient, db: Session) -> None:
+    email = random_email()
+    google_response = Mock(
+        status_code=200,
+        json=Mock(
+            return_value={
+                "aud": settings.GOOGLE_CLIENT_ID,
+                "email_verified": "true",
+                "email": email,
+                "name": "Google User",
+            }
+        ),
+    )
+
+    with patch("app.api.routes.login.httpx.get", return_value=google_response):
+        r = client.post(
+            f"{settings.API_V1_STR}/login/google",
+            json={"credential": "valid-google-credential"},
+        )
+
+    tokens = r.json()
+    assert r.status_code == 200
+    assert tokens["access_token"]
+
+    user = db.exec(select(User).where(User.email == email)).first()
+    assert user
+    assert user.full_name == "Google User"
+
+
+def test_google_login_existing_user_returns_token(
+    client: TestClient, db: Session
+) -> None:
+    email = random_email()
+    user = create_user(
+        session=db,
+        user_create=UserCreate(
+            email=email,
+            full_name="Existing User",
+            password=random_lower_string(),
+        ),
+    )
+    google_response = Mock(
+        status_code=200,
+        json=Mock(
+            return_value={
+                "aud": settings.GOOGLE_CLIENT_ID,
+                "email_verified": True,
+                "email": email,
+                "name": "Updated Google Name",
+            }
+        ),
+    )
+
+    with patch("app.api.routes.login.httpx.get", return_value=google_response):
+        r = client.post(
+            f"{settings.API_V1_STR}/login/google",
+            json={"credential": "valid-google-credential"},
+        )
+
+    tokens = r.json()
+    assert r.status_code == 200
+    assert tokens["access_token"]
+
+    db.refresh(user)
+    assert user.full_name == "Existing User"
+
+
+def test_google_login_rejects_wrong_audience(client: TestClient) -> None:
+    google_response = Mock(
+        status_code=200,
+        json=Mock(
+            return_value={
+                "aud": "other-client-id.apps.googleusercontent.com",
+                "email_verified": "true",
+                "email": random_email(),
+            }
+        ),
+    )
+
+    with patch("app.api.routes.login.httpx.get", return_value=google_response):
+        r = client.post(
+            f"{settings.API_V1_STR}/login/google",
+            json={"credential": "wrong-audience-credential"},
+        )
+
+    assert r.status_code == 401
+    assert r.json()["detail"] == "Google credential audience mismatch"
 
 
 def test_use_access_token(
