@@ -10,6 +10,7 @@ declare global {
           initialize: (options: {
             client_id: string
             callback: (response: { credential?: string }) => void
+            use_fedcm_for_button?: boolean
           }) => void
           renderButton: (
             element: HTMLElement,
@@ -83,6 +84,7 @@ export function GoogleAuthButton() {
             googleLoginMutate(response.credential)
           }
         },
+        use_fedcm_for_button: true,
       })
       hostElement.innerHTML = ""
       window.google.accounts.id.renderButton(hostElement, {
