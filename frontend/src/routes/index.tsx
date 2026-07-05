@@ -1,18 +1,18 @@
 import { createFileRoute, Link as RouterLink } from "@tanstack/react-router"
 import {
   ArrowRight,
-  BadgeCheck,
   ChartColumnIncreasing,
   ChevronDown,
   Leaf,
   Map,
   Sprout,
 } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import { Logo } from "@/components/Common/Logo"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 const featureCards = [
   {
@@ -77,191 +77,251 @@ export const Route = createFileRoute("/")({
 
 function LandingPage() {
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+  const [isNavSolid, setIsNavSolid] = useState(false)
+  const [isDashboardPreviewMounted, setIsDashboardPreviewMounted] =
+    useState(false)
+  const [showDashboardPreview, setShowDashboardPreview] = useState(false)
+
+  useEffect(() => {
+    const updateNavSurface = () => {
+      setIsNavSolid(window.scrollY > window.innerHeight - 96)
+    }
+
+    updateNavSurface()
+    window.addEventListener("scroll", updateNavSurface, { passive: true })
+    window.addEventListener("resize", updateNavSurface)
+
+    return () => {
+      window.removeEventListener("scroll", updateNavSurface)
+      window.removeEventListener("resize", updateNavSurface)
+    }
+  }, [])
+
+  useEffect(() => {
+    const timer = window.setTimeout(() => {
+      setIsDashboardPreviewMounted(true)
+      window.requestAnimationFrame(() => {
+        setShowDashboardPreview(true)
+      })
+    }, 5000)
+
+    return () => window.clearTimeout(timer)
+  }, [])
 
   return (
-    <div className="public-shell min-h-screen bg-[linear-gradient(180deg,#fffdf8_0%,#f6eddc_100%)] text-[#163127]">
-      <header className="sticky top-0 z-20 border-b border-[#e7dbc8]/80 bg-[#fffaf2]/90 backdrop-blur-sm">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-6 py-4 lg:px-8">
-          <Logo tone="dark" />
-          <nav className="hidden items-center gap-8 text-sm font-medium text-[#586255] md:flex">
-            <a href="#fitur" className="transition hover:text-[#163127]">
+    <div className="public-shell min-h-screen bg-[#f7f0e3] text-[#163127]">
+      <header className="fixed inset-x-0 top-0 z-[100] px-4 pt-4 sm:px-6">
+        <div
+          className={cn(
+            "mx-auto flex w-full max-w-[calc(100rem-2rem)] items-center justify-between gap-4 rounded-full border px-4 py-3 transition-all duration-300 lg:px-6",
+            isNavSolid
+              ? "border-[#eadfcd]/80 bg-[#fffaf2]/86 shadow-[0_18px_55px_rgba(82,69,45,0.12)] backdrop-blur-md"
+              : "border-transparent bg-transparent shadow-none",
+          )}
+        >
+          <Logo tone={isNavSolid ? "dark" : "light"} />
+          <nav
+            className={cn(
+              "hidden items-center gap-9 text-sm font-semibold transition-colors duration-300 md:flex",
+              isNavSolid ? "text-[#24473b]" : "text-white/86",
+            )}
+          >
+            <a
+              href="#fitur"
+              className={cn(
+                "transition",
+                isNavSolid ? "hover:text-[#163127]" : "hover:text-white",
+              )}
+            >
               Fitur
             </a>
-            <a href="#alur" className="transition hover:text-[#163127]">
+            <a
+              href="#alur"
+              className={cn(
+                "transition",
+                isNavSolid ? "hover:text-[#163127]" : "hover:text-white",
+              )}
+            >
               Alur Kerja
             </a>
-            <a href="#insight" className="transition hover:text-[#163127]">
+            <a
+              href="#insight"
+              className={cn(
+                "transition",
+                isNavSolid ? "hover:text-[#163127]" : "hover:text-white",
+              )}
+            >
               Insight
             </a>
           </nav>
           <div className="flex items-center gap-3">
             <Button
               variant="ghost"
-              className="rounded-full px-5 text-[#24473b] hover:bg-[#efe6d7]"
+              className={cn(
+                "hidden rounded-full px-5 sm:inline-flex",
+                isNavSolid
+                  ? "text-[#24473b] hover:bg-[#efe6d7] hover:text-[#163127]"
+                  : "text-white hover:bg-white/12 hover:text-white",
+              )}
               asChild
             >
               <RouterLink to="/login">Masuk</RouterLink>
             </Button>
             <Button
-              className="rounded-full bg-[#24473b] px-5 text-[#fffaf2] hover:bg-[#24473b]"
+              className={cn(
+                "rounded-full px-5 shadow-[0_16px_40px_rgba(0,0,0,0.18)]",
+                isNavSolid
+                  ? "bg-[#24473b] text-[#fffaf2] hover:bg-[#24473b]"
+                  : "bg-white text-[#111917] hover:bg-white",
+              )}
               asChild
             >
-              <RouterLink to="/signup">Coba Sekarang</RouterLink>
+              <RouterLink to="/signup">
+                Coba Sekarang
+                <ArrowRight data-icon="inline-end" />
+              </RouterLink>
             </Button>
           </div>
         </div>
       </header>
 
       <main>
-        <section className="relative flex min-h-[calc(100svh-5rem)] items-center overflow-hidden">
-          <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(255,251,243,0.96)_0%,rgba(250,242,228,0.86)_100%)]" />
-          <div className="absolute inset-x-0 top-0 h-[32rem] bg-[radial-gradient(circle_at_14%_22%,rgba(212,163,93,0.18),transparent_24%),radial-gradient(circle_at_84%_18%,rgba(108,143,65,0.22),transparent_28%),radial-gradient(circle_at_62%_62%,rgba(255,255,255,0.7),transparent_26%)]" />
-          <div className="absolute inset-y-0 left-[-8%] hidden w-[28rem] rounded-full bg-[#f4dcb2]/25 blur-3xl lg:block" />
-          <div className="absolute right-[-6%] top-12 hidden h-[24rem] w-[24rem] rounded-full bg-[#dbe8cf]/55 blur-3xl lg:block" />
-          <div className="absolute inset-x-0 bottom-0 h-24 bg-[linear-gradient(180deg,rgba(255,250,242,0)_0%,rgba(255,250,242,0.75)_72%,rgba(255,250,242,0.96)_100%)]" />
-          <div className="mx-auto grid w-full max-w-7xl gap-12 px-6 py-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center lg:px-8 lg:py-16">
-            <div className="relative z-10 flex max-w-2xl flex-col gap-7">
-              <div className="inline-flex w-fit items-center gap-2 rounded-full border border-[#d9ccb5] bg-white/80 px-4 py-2 text-sm font-medium text-[#53604f] shadow-[0_10px_30px_rgba(113,94,60,0.08)]">
-                <BadgeCheck className="size-4 text-[#6c8f41]" />
-                Platform keputusan tanam yang lebih terarah
-              </div>
-              <div className="flex flex-col gap-4">
-                <h1 className="max-w-xl font-[Fraunces] text-5xl leading-[1.02] tracking-[-0.05em] text-[#24473b] md:text-6xl">
-                  Tautkan data lahan, harga, dan wilayah ke keputusan tanam yang
-                  lebih yakin.
+        <section className="relative z-20 overflow-visible bg-[#f7f0e3] p-3 pb-0 sm:p-4 sm:pb-0">
+          <div className="relative flex min-h-[calc(120svh-1.5rem)] items-start justify-center overflow-visible rounded-[2rem] pt-[12rem] sm:min-h-[calc(120svh-2rem)] sm:rounded-[2.4rem] md:pt-[12.5rem]">
+            <img
+              src="/assets/images/hero-sawah-bg.png"
+              alt=""
+              className="absolute inset-0 size-full rounded-[2rem] object-cover sm:rounded-[2.4rem]"
+              aria-hidden="true"
+            />
+            <div className="absolute inset-0 rounded-[2rem] bg-[linear-gradient(180deg,rgba(6,20,27,0.18)_0%,rgba(6,20,27,0.14)_34%,rgba(6,20,27,0.28)_74%,rgba(6,20,27,0.46)_100%)] sm:rounded-[2.4rem]" />
+            <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_50%_28%,rgba(255,255,255,0.15),transparent_30%)] sm:rounded-[2.4rem]" />
+            <div className="relative z-20 mx-auto flex w-full max-w-7xl flex-col items-center px-6 pb-20 text-center sm:pb-24 md:pb-[22rem] lg:px-8">
+              <div className="flex max-w-5xl flex-col items-center gap-5">
+                <h1 className="font-[Fraunces] text-5xl leading-[1.02] text-white drop-shadow-[0_8px_34px_rgba(0,0,0,0.28)] sm:text-6xl md:text-7xl lg:text-[6.8rem]">
+                  Buat keputusan tanam yang lebih terarah
                 </h1>
-                <p className="max-w-xl text-lg leading-8 text-[#5d6659]">
+                <p className="max-w-2xl text-base leading-8 text-white/82 md:text-lg">
                   TaniLink membantu petani membaca kondisi lahan, memantau
                   pergerakan harga, dan menemukan rekomendasi tanam dalam satu
                   alur yang sederhana.
                 </p>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Button
-                  size="lg"
-                  className="h-12 rounded-full bg-[#24473b] px-6 text-base text-[#fffaf2] hover:bg-[#24473b]"
-                  asChild
-                >
-                  <RouterLink to="/signup">
-                    Mulai Gratis
-                    <ArrowRight data-icon="inline-end" />
-                  </RouterLink>
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="h-12 rounded-full border-[#d8ccb7] bg-white/70 px-6 text-base text-[#24473b] hover:bg-white"
-                  asChild
-                >
-                  <RouterLink to="/login">Masuk ke Dashboard</RouterLink>
-                </Button>
-              </div>
             </div>
 
-            <div className="relative">
-              <div className="absolute -right-4 top-10 hidden h-36 w-36 rounded-full bg-[#d8e5d3] blur-3xl lg:block" />
-              <Card className="relative overflow-hidden rounded-[32px] border-[#e5dac8] bg-[#fffdf8]/95">
-                <CardContent className="flex flex-col gap-6 p-6 md:p-7">
-                  <div className="flex items-center justify-between rounded-[26px] border border-[#ebe0cf] bg-[#fffaf2] px-5 py-4">
-                    <div>
-                      <p className="text-sm font-medium text-[#7a7468]">
-                        Wilayah aktif
-                      </p>
-                      <p className="pt-1 text-xl font-semibold text-[#24473b]">
-                        Kab. Jombang
-                      </p>
-                    </div>
-                    <div className="rounded-full bg-[#eaf1e8] px-4 py-2 text-sm font-semibold text-[#24473b]">
-                      Musim tanam siap
-                    </div>
-                  </div>
-
-                  <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
-                    <div className="rounded-[28px] border border-[#ebe0cf] bg-[linear-gradient(180deg,#24473b_0%,#19362c_100%)] p-4 text-[#f9f5eb]">
-                      <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-                        <div className="min-w-0">
-                          <p className="text-sm text-[#d7e1d6]">
-                            Rekomendasi utama
-                          </p>
-                          <h2 className="pt-2 text-[1.9rem] leading-[1.18] font-semibold">
-                            Padi dan jagung pada lahan lempung berpasir
-                          </h2>
-                        </div>
-                        <div className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#ecf5e8]">
-                          Stabil
-                        </div>
+            {isDashboardPreviewMounted ? (
+              <div
+                className={cn(
+                  "absolute inset-x-4 bottom-[-16rem] z-30 mx-auto hidden max-w-6xl transform-gpu transition-all duration-[900ms] ease-out md:block lg:bottom-[-17rem]",
+                  showDashboardPreview
+                    ? "translate-y-0 scale-100 opacity-100 blur-0"
+                    : "translate-y-20 scale-[0.985] opacity-0 blur-md",
+                )}
+              >
+                <Card className="relative overflow-hidden rounded-[32px] border-[#e5dac8] bg-[#fffdf8]/95 shadow-none">
+                  <CardContent className="flex flex-col gap-6 p-6 md:p-7">
+                    <div className="flex items-center justify-between rounded-[26px] border border-[#ebe0cf] bg-[#fffaf2] px-5 py-4">
+                      <div>
+                        <p className="text-sm font-medium text-[#7a7468]">
+                          Wilayah aktif
+                        </p>
+                        <p className="pt-1 text-xl font-semibold text-[#24473b]">
+                          Kab. Jombang
+                        </p>
                       </div>
-                      <div className="mt-6 grid grid-cols-2 gap-3">
-                        {[
-                          ["Kelembapan", "68%"],
-                          ["pH Tanah", "6.3"],
-                        ].map(([label, value]) => (
-                          <div
-                            key={label}
-                            className="flex min-h-[6.2rem] min-w-0 flex-col rounded-2xl border border-white/10 bg-white/8 px-4 py-3.5"
-                          >
-                            <p className="text-xs leading-5 text-[#d7e1d6]">
-                              {label}
+                      <div className="rounded-full bg-[#eaf1e8] px-4 py-2 text-sm font-semibold text-[#24473b]">
+                        Musim tanam siap
+                      </div>
+                    </div>
+
+                    <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr]">
+                      <div className="rounded-[28px] border border-[#ebe0cf] bg-[linear-gradient(180deg,#24473b_0%,#19362c_100%)] p-4 text-[#f9f5eb]">
+                        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                          <div className="min-w-0">
+                            <p className="text-sm text-[#d7e1d6]">
+                              Rekomendasi utama
                             </p>
-                            <p className="pt-3 text-[1.6rem] leading-none font-semibold">
-                              {value}
+                            <h2 className="pt-2 text-[1.9rem] leading-[1.18] font-semibold">
+                              Padi dan jagung pada lahan lempung berpasir
+                            </h2>
+                          </div>
+                          <div className="w-fit rounded-full bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.18em] text-[#ecf5e8]">
+                            Stabil
+                          </div>
+                        </div>
+                        <div className="mt-6 grid grid-cols-2 gap-3">
+                          {[
+                            ["Kelembapan", "68%"],
+                            ["pH Tanah", "6.3"],
+                          ].map(([label, value]) => (
+                            <div
+                              key={label}
+                              className="flex min-h-[6.2rem] min-w-0 flex-col rounded-2xl border border-white/10 bg-white/8 px-4 py-3.5"
+                            >
+                              <p className="text-xs leading-5 text-[#d7e1d6]">
+                                {label}
+                              </p>
+                              <p className="pt-3 text-[1.6rem] leading-none font-semibold">
+                                {value}
+                              </p>
+                            </div>
+                          ))}
+                          <div className="col-span-2 flex min-h-[5.8rem] min-w-0 flex-col rounded-2xl border border-white/10 bg-white/8 px-4 py-3.5">
+                            <p className="text-xs leading-5 text-[#d7e1d6]">
+                              Curah Hujan
+                            </p>
+                            <p className="pt-3 text-[1.3rem] leading-none font-semibold">
+                              Sedang
                             </p>
                           </div>
-                        ))}
-                        <div className="col-span-2 flex min-h-[5.8rem] min-w-0 flex-col rounded-2xl border border-white/10 bg-white/8 px-4 py-3.5">
-                          <p className="text-xs leading-5 text-[#d7e1d6]">
-                            Curah Hujan
-                          </p>
-                          <p className="pt-3 text-[1.3rem] leading-none font-semibold">
-                            Sedang
-                          </p>
                         </div>
                       </div>
-                    </div>
 
-                    <div className="flex flex-col gap-4">
-                      <div className="rounded-[28px] border border-[#ebe0cf] bg-[#f5eedf] p-5">
-                        <p className="text-sm font-medium text-[#7a7468]">
-                          Prediksi harga
-                        </p>
-                        <p className="pt-2 text-3xl font-semibold text-[#24473b]">
-                          Rp5.450/kg
-                        </p>
-                        <div className="mt-4 flex items-end gap-2">
-                          {[56, 72, 64, 86, 78, 92].map((height, index) => (
-                            <span
-                              key={`${height}-${index}`}
-                              className="block flex-1 rounded-full bg-[#c98a4b]"
-                              style={{ height }}
-                            />
-                          ))}
+                      <div className="flex flex-col gap-4">
+                        <div className="rounded-[28px] border border-[#ebe0cf] bg-[#f5eedf] p-5">
+                          <p className="text-sm font-medium text-[#7a7468]">
+                            Prediksi harga
+                          </p>
+                          <p className="pt-2 text-3xl font-semibold text-[#24473b]">
+                            Rp5.450/kg
+                          </p>
+                          <div className="mt-4 flex items-end gap-2">
+                            {[56, 72, 64, 86, 78, 92].map((height, index) => (
+                              <span
+                                key={`${height}-${index}`}
+                                className="block flex-1 rounded-full bg-[#c98a4b]"
+                                style={{ height }}
+                              />
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                      <div className="rounded-[28px] border border-[#ebe0cf] bg-white p-5">
-                        <p className="text-sm font-medium text-[#7a7468]">
-                          Pemetaan cepat
-                        </p>
-                        <div className="mt-4 overflow-hidden rounded-[22px] border border-[#eef1e5] bg-[#eef4e7]">
-                          <img
-                            src="/assets/images/hero-map-card.png"
-                            alt="Peta lahan"
-                            className="h-[10.75rem] w-full object-cover"
-                          />
+                        <div className="rounded-[28px] border border-[#ebe0cf] bg-white p-5">
+                          <p className="text-sm font-medium text-[#7a7468]">
+                            Pemetaan cepat
+                          </p>
+                          <div className="mt-4 overflow-hidden rounded-[22px] border border-[#eef1e5] bg-[#eef4e7]">
+                            <img
+                              src="/assets/images/hero-map-card.png"
+                              alt="Peta lahan"
+                              className="h-[10.75rem] w-full object-cover"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
+                  </CardContent>
+                </Card>
+              </div>
+            ) : null}
           </div>
         </section>
 
         <section
           id="fitur"
-          className="mx-auto w-full max-w-7xl px-6 py-10 lg:px-8 lg:py-14"
+          className="relative z-10 -mt-1 rounded-t-[2.5rem] bg-[#f7f0e3] px-6 pt-80 pb-10 lg:px-8 lg:pt-88 lg:pb-14"
         >
-          <div className="mb-8 max-w-2xl">
+          <div className="mx-auto w-full max-w-7xl">
+            <div className="mb-8 max-w-2xl">
             <p className="text-sm font-semibold uppercase tracking-[0.18em] text-[#7b8067]">
               Fitur utama
             </p>
@@ -269,8 +329,8 @@ function LandingPage() {
               Dibuat untuk membaca kondisi lapangan tanpa membuat alur kerja
               terasa rumit.
             </h2>
-          </div>
-          <div className="grid gap-5 lg:grid-cols-3">
+            </div>
+            <div className="grid gap-5 lg:grid-cols-3">
             {featureCards.map((feature) => (
               <Card
                 key={feature.title}
@@ -291,6 +351,7 @@ function LandingPage() {
                 </CardContent>
               </Card>
             ))}
+            </div>
           </div>
         </section>
 
