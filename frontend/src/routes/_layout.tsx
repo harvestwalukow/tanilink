@@ -35,7 +35,6 @@ function LayoutContent() {
   })
   const isOnboardingPage = pathname === "/onboarding"
   const userName = user?.full_name || user?.email || "TaniLink"
-  const userRole = user?.is_superuser ? "Admin" : "Petani"
 
   return (
     <div className="app-shell min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(238,232,212,0.85),_transparent_32%),linear-gradient(180deg,_#fffdf7_0%,_#f9f3e8_100%)]">
@@ -52,14 +51,11 @@ function LayoutContent() {
                 <DropdownMenuTrigger asChild>
                   <Button
                     variant="outline"
-                    className="h-11 w-11 gap-2 rounded-[24px] border-[#426a5b] bg-[#24473b] px-0! text-left text-[#fffaf1] shadow-[0_1px_2px_rgba(15,38,31,0.24)] hover:bg-[#2e594a] sm:w-auto sm:gap-3 sm:pl-5! sm:pr-4!"
+                    className="h-9 w-9 gap-2 rounded-2xl border-[#426a5b] bg-[#24473b] px-0! text-left text-[#fffaf1] shadow-[0_1px_2px_rgba(15,38,31,0.24)] hover:bg-[#2e594a] sm:w-auto sm:gap-2.5 sm:pl-3.5! sm:pr-2.5!"
                   >
                     <div className="hidden min-w-0 flex-1 text-left sm:block">
-                      <div className="max-w-[180px] truncate text-[0.95rem] font-semibold leading-tight text-[#fffaf1]">
+                      <div className="max-w-[180px] truncate text-sm font-semibold leading-none text-[#fffaf1]">
                         {userName}
-                      </div>
-                      <div className="truncate pt-0.5 text-[0.78rem] leading-tight text-[#dce8df]">
-                        {userRole}
                       </div>
                     </div>
                     <ChevronDown className="size-4 text-[#fffaf1]" />
