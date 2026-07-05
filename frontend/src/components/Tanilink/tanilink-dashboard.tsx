@@ -227,7 +227,11 @@ function PricePanel({
   }, [forecast])
   const [hoverIndex, setHoverIndex] = useState<number | null>(null)
   const [hoverX, setHoverX] = useState<number | null>(null)
-  const values = chartPoints.map((point) => point.harga_pred)
+  const values = chartPoints.flatMap((point) => [
+    point.harga_lower,
+    point.harga_pred,
+    point.harga_upper,
+  ])
   const min = Math.min(...values)
   const max = Math.max(...values)
   const range = Math.max(1, max - min)
@@ -246,11 +250,32 @@ function PricePanel({
       return `${index === 0 ? "M" : "L"} ${x} ${y}`
     })
     .join(" ")
+  const upperPath = chartPoints
+    .map((point, index) => {
+      const x = getChartX(index)
+      const y = getChartY(point.harga_upper)
+      return `${index === 0 ? "M" : "L"} ${x} ${y}`
+    })
+    .join(" ")
+  const confidenceBandPath =
+    chartPoints.length > 0
+      ? `${upperPath} ${chartPoints
+          .map((_point, index) => {
+            const reverseIndex = chartPoints.length - 1 - index
+            const x = getChartX(reverseIndex)
+            const y = getChartY(chartPoints[reverseIndex].harga_lower)
+            return `L ${x} ${y}`
+          })
+          .join(" ")} Z`
+      : ""
   const areaPath =
     chartPoints.length > 0
       ? `${linePath} L ${getChartX(chartPoints.length - 1)} ${CHART_BOTTOM} L ${getChartX(0)} ${CHART_BOTTOM} Z`
       : ""
   const todayIndex = chartPoints.findIndex((point) => !point.sudah_lewat)
+  const extrapolationIndex = chartPoints.findIndex(
+    (point) => point.status === "ekstrapolasi",
+  )
   const hoverPoint = hoverIndex === null ? null : chartPoints[hoverIndex]
   const firstPoint = chartPoints[0]
   const middlePoint = chartPoints[Math.floor(chartPoints.length / 2)]
@@ -311,12 +336,18 @@ function PricePanel({
           <div className="rounded-[18px] border border-[#eadfcf] bg-white p-5">
             <div className="relative rounded-[16px] border border-[#efe4d3] bg-[#fffefb] p-3">
               <div className="mb-2 flex items-center justify-between gap-3 text-xs text-[#71695c]">
-                <div className="flex items-center gap-1.5 font-semibold text-[#163127]">
-                  <span
-                    className="size-2 rounded-full"
-                    style={{ backgroundColor: lineColor }}
-                  />
-                  Harga {commodityLabel(forecast.komoditas)}
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                  <div className="flex items-center gap-1.5 font-semibold text-[#163127]">
+                    <span
+                      className="size-2 rounded-full"
+                      style={{ backgroundColor: lineColor }}
+                    />
+                    Harga {commodityLabel(forecast.komoditas)}
+                  </div>
+                  <div className="flex items-center gap-1.5 text-[11px] text-[#7e7669]">
+                    <span className="h-2.5 w-2.5 rounded-sm bg-[#24473b]/12 ring-1 ring-[#24473b]/20" />
+                    Confidence interval
+                  </div>
                 </div>
                 <span>Rp/kg</span>
               </div>
@@ -346,6 +377,13 @@ function PricePanel({
                     strokeDasharray="4 7"
                   />
                 ))}
+                {confidenceBandPath ? (
+                  <path
+                    d={confidenceBandPath}
+                    fill={lineColor}
+                    opacity="0.12"
+                  />
+                ) : null}
                 {todayIndex >= 0 ? (
                   <line
                     x1={getChartX(todayIndex)}
@@ -354,6 +392,16 @@ function PricePanel({
                     y2={CHART_BOTTOM}
                     stroke="#d8ccb9"
                     strokeDasharray="4 6"
+                  />
+                ) : null}
+                {extrapolationIndex >= 0 ? (
+                  <line
+                    x1={getChartX(extrapolationIndex)}
+                    y1={CHART_TOP}
+                    x2={getChartX(extrapolationIndex)}
+                    y2={CHART_BOTTOM}
+                    stroke="#c98a4b"
+                    strokeDasharray="5 5"
                   />
                 ) : null}
                 {areaPath ? (
@@ -420,9 +468,20 @@ function PricePanel({
                   {latest ? formatShortDate(latest.tanggal) : "-"}
                 </span>
               </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {forecast.ci_width_pct !== null ? (
+                  <Badge
+                    variant="outline"
+                    className="rounded-full border-[#e6dbc9] bg-[#fffaf2] px-2.5 py-0 text-[10px] text-[#6b655a]"
+                  >
+                    Confidence interval +/-{forecast.ci_width_pct}%
+                  </Badge>
+                ) : null}
+
+              </div>
               {hoverX !== null && hoverPoint ? (
                 <div
-                  className="pointer-events-none absolute top-12 z-10 w-[170px] rounded-xl border border-[#eadfcf] bg-white/95 p-3 text-xs text-[#2c3c2d] shadow-md backdrop-blur-sm"
+                  className="pointer-events-none absolute top-12 z-10 w-[200px] rounded-xl border border-[#eadfcf] bg-white/95 p-3 text-xs text-[#2c3c2d] shadow-md backdrop-blur-sm"
                   style={{
                     left:
                       hoverX > CHART_WIDTH / 2
@@ -439,12 +498,28 @@ function PricePanel({
                       {formatCurrency(hoverPoint.harga_pred)}
                     </span>
                   </div>
+                  <div className="mt-1 flex items-center justify-between gap-2">
+                    <span className="text-[#6c655a]">Interval</span>
+                    <span className="font-medium text-[#1d3429]">
+                      {formatCurrency(hoverPoint.harga_lower)} -{" "}
+                      {formatCurrency(hoverPoint.harga_upper)}
+                    </span>
+                  </div>
+                  <div className="mt-1 flex items-center justify-between gap-2">
+                    <span className="text-[#6c655a]">Status</span>
+                    <span className="font-medium text-[#1d3429]">
+                      {hoverPoint.status === "ekstrapolasi"
+                        ? "Ekstrapolasi"
+                        : "Tervalidasi"}
+                    </span>
+                  </div>
                 </div>
               ) : null}
             </div>
             <div className="mt-4 border-t border-[#f4eadb] pt-3 text-sm leading-relaxed text-[#6c655a]">
               {forecast.ringkasan}
             </div>
+
           </div>
         </div>
       ) : (

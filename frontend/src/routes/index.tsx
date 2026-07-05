@@ -196,7 +196,7 @@ function LandingPage() {
             />
             <div className="absolute inset-0 rounded-[2rem] bg-[linear-gradient(180deg,rgba(6,20,27,0.18)_0%,rgba(6,20,27,0.14)_34%,rgba(6,20,27,0.28)_74%,rgba(6,20,27,0.46)_100%)] sm:rounded-[2.4rem]" />
             <div className="absolute inset-0 rounded-[2rem] bg-[radial-gradient(circle_at_50%_28%,rgba(255,255,255,0.15),transparent_30%)] sm:rounded-[2.4rem]" />
-            <div className="relative z-20 mx-auto flex w-full max-w-7xl flex-col items-center px-6 pb-20 text-center sm:pb-24 md:pb-[22rem] lg:px-8">
+            <div className="relative z-20 mx-auto flex w-full max-w-7xl flex-col items-center px-6 pb-20 text-center sm:pb-24 md:pb-[26rem] lg:pb-[28rem] lg:px-8">
               <div className="flex max-w-5xl flex-col items-center gap-5">
                 <h1 className="font-[Fraunces] text-5xl leading-[1.02] text-white drop-shadow-[0_8px_34px_rgba(0,0,0,0.28)] sm:text-6xl md:text-7xl lg:text-[6.8rem]">
                   Buat keputusan tanam yang lebih terarah
