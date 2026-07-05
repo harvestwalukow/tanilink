@@ -18,6 +18,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as LayoutRekomendasiTanamRouteImport } from './routes/_layout/rekomendasi-tanam'
 import { Route as LayoutPrediksiHargaRouteImport } from './routes/_layout/prediksi-harga'
 import { Route as LayoutPetaWilayahRouteImport } from './routes/_layout/peta-wilayah'
+import { Route as LayoutOnboardingRouteImport } from './routes/_layout/onboarding'
 import { Route as LayoutKesesuaianLahanRouteImport } from './routes/_layout/kesesuaian-lahan'
 import { Route as LayoutItemsRouteImport } from './routes/_layout/items'
 import { Route as LayoutAppRouteImport } from './routes/_layout/app'
@@ -67,6 +68,11 @@ const LayoutPetaWilayahRoute = LayoutPetaWilayahRouteImport.update({
   path: '/peta-wilayah',
   getParentRoute: () => LayoutRoute,
 } as any)
+const LayoutOnboardingRoute = LayoutOnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => LayoutRoute,
+} as any)
 const LayoutKesesuaianLahanRoute = LayoutKesesuaianLahanRouteImport.update({
   id: '/kesesuaian-lahan',
   path: '/kesesuaian-lahan',
@@ -98,6 +104,7 @@ export interface FileRoutesByFullPath {
   '/app': typeof LayoutAppRoute
   '/items': typeof LayoutItemsRoute
   '/kesesuaian-lahan': typeof LayoutKesesuaianLahanRoute
+  '/onboarding': typeof LayoutOnboardingRoute
   '/peta-wilayah': typeof LayoutPetaWilayahRoute
   '/prediksi-harga': typeof LayoutPrediksiHargaRoute
   '/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
@@ -112,6 +119,7 @@ export interface FileRoutesByTo {
   '/app': typeof LayoutAppRoute
   '/items': typeof LayoutItemsRoute
   '/kesesuaian-lahan': typeof LayoutKesesuaianLahanRoute
+  '/onboarding': typeof LayoutOnboardingRoute
   '/peta-wilayah': typeof LayoutPetaWilayahRoute
   '/prediksi-harga': typeof LayoutPrediksiHargaRoute
   '/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
@@ -128,6 +136,7 @@ export interface FileRoutesById {
   '/_layout/app': typeof LayoutAppRoute
   '/_layout/items': typeof LayoutItemsRoute
   '/_layout/kesesuaian-lahan': typeof LayoutKesesuaianLahanRoute
+  '/_layout/onboarding': typeof LayoutOnboardingRoute
   '/_layout/peta-wilayah': typeof LayoutPetaWilayahRoute
   '/_layout/prediksi-harga': typeof LayoutPrediksiHargaRoute
   '/_layout/rekomendasi-tanam': typeof LayoutRekomendasiTanamRoute
@@ -144,6 +153,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/items'
     | '/kesesuaian-lahan'
+    | '/onboarding'
     | '/peta-wilayah'
     | '/prediksi-harga'
     | '/rekomendasi-tanam'
@@ -158,6 +168,7 @@ export interface FileRouteTypes {
     | '/app'
     | '/items'
     | '/kesesuaian-lahan'
+    | '/onboarding'
     | '/peta-wilayah'
     | '/prediksi-harga'
     | '/rekomendasi-tanam'
@@ -173,6 +184,7 @@ export interface FileRouteTypes {
     | '/_layout/app'
     | '/_layout/items'
     | '/_layout/kesesuaian-lahan'
+    | '/_layout/onboarding'
     | '/_layout/peta-wilayah'
     | '/_layout/prediksi-harga'
     | '/_layout/rekomendasi-tanam'
@@ -252,6 +264,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LayoutPetaWilayahRouteImport
       parentRoute: typeof LayoutRoute
     }
+    '/_layout/onboarding': {
+      id: '/_layout/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof LayoutOnboardingRouteImport
+      parentRoute: typeof LayoutRoute
+    }
     '/_layout/kesesuaian-lahan': {
       id: '/_layout/kesesuaian-lahan'
       path: '/kesesuaian-lahan'
@@ -288,6 +307,7 @@ interface LayoutRouteChildren {
   LayoutAppRoute: typeof LayoutAppRoute
   LayoutItemsRoute: typeof LayoutItemsRoute
   LayoutKesesuaianLahanRoute: typeof LayoutKesesuaianLahanRoute
+  LayoutOnboardingRoute: typeof LayoutOnboardingRoute
   LayoutPetaWilayahRoute: typeof LayoutPetaWilayahRoute
   LayoutPrediksiHargaRoute: typeof LayoutPrediksiHargaRoute
   LayoutRekomendasiTanamRoute: typeof LayoutRekomendasiTanamRoute
@@ -298,6 +318,7 @@ const LayoutRouteChildren: LayoutRouteChildren = {
   LayoutAppRoute: LayoutAppRoute,
   LayoutItemsRoute: LayoutItemsRoute,
   LayoutKesesuaianLahanRoute: LayoutKesesuaianLahanRoute,
+  LayoutOnboardingRoute: LayoutOnboardingRoute,
   LayoutPetaWilayahRoute: LayoutPetaWilayahRoute,
   LayoutPrediksiHargaRoute: LayoutPrediksiHargaRoute,
   LayoutRekomendasiTanamRoute: LayoutRekomendasiTanamRoute,

@@ -10,10 +10,12 @@ import {
   type UserRegister,
   UsersService,
 } from "@/client"
+import { resetOnboardingComplete } from "@/lib/dashboard-filters"
 import { handleError } from "@/utils"
 import useCustomToast from "./useCustomToast"
 
 export const APP_HOME_PATH = "/app"
+export const APP_ONBOARDING_PATH = "/onboarding"
 export const DUMMY_ACCOUNT = {
   email: "demo@tanilink.local",
   password: "demo12345",
@@ -95,8 +97,9 @@ const useAuth = () => {
   const loginMutation = useMutation({
     mutationFn: login,
     onSuccess: () => {
+      resetOnboardingComplete()
       queryClient.invalidateQueries({ queryKey: ["currentUser"] })
-      navigate({ to: APP_HOME_PATH })
+      navigate({ to: APP_ONBOARDING_PATH })
     },
     onError: handleError.bind(showErrorToast),
   })
@@ -104,8 +107,9 @@ const useAuth = () => {
   const googleLoginMutation = useMutation({
     mutationFn: googleLogin,
     onSuccess: () => {
+      resetOnboardingComplete()
       queryClient.invalidateQueries({ queryKey: ["currentUser"] })
-      navigate({ to: APP_HOME_PATH })
+      navigate({ to: APP_ONBOARDING_PATH })
     },
     onError: handleError.bind(showErrorToast),
   })
