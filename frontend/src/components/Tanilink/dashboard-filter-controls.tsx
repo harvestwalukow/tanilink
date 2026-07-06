@@ -16,6 +16,7 @@ import {
   type WheelEvent,
 } from "react"
 import { Button } from "@/components/ui/button"
+import { toast } from "sonner"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -70,6 +71,37 @@ async function getLocationName(lat: number, lon: number) {
   )
   if (!response.ok) return fallbackLocationName(lat, lon)
   const payload = await response.json()
+
+  // Check for Nominatim error response (usually open ocean / sea)
+  if (payload.error) {
+    throw new Error("LOKASI_DI_LAUT")
+  }
+
+  // Check if class/category or type indicates a water body/sea/ocean
+  const category = payload.category ?? payload.class ?? ""
+  const type = payload.type ?? ""
+  const name = (payload.name ?? "").toLowerCase()
+  const displayName = (payload.display_name ?? "").toLowerCase()
+
+  const isWater = 
+    (category === "natural" && type === "water") ||
+    (category === "place" && (type === "sea" || type === "ocean")) ||
+    type === "sea" || 
+    type === "ocean" ||
+    name.includes("ocean") || 
+    name.includes("samudra") || 
+    name.includes("laut") || 
+    name.includes("strait") || 
+    name.includes("selat") ||
+    displayName.includes("ocean") ||
+    displayName.includes("samudra") ||
+    displayName.includes("laut ") ||
+    displayName.includes(" selat")
+
+  if (isWater) {
+    throw new Error("LOKASI_DI_LAUT")
+  }
+
   const address = payload?.address ?? {}
   const primary =
     address.village ??
@@ -79,6 +111,12 @@ async function getLocationName(lat: number, lon: number) {
     address.municipality ??
     address.county ??
     address.state_district
+
+  // If no land-based administrative divisions are found at all, it's likely sea/water
+  if (!primary) {
+    throw new Error("LOKASI_DI_LAUT")
+  }
+
   const secondary = [
     address.city,
     address.county,
@@ -208,16 +246,34 @@ export function DashboardLocationPicker({
     pendingLabel: string
     successStatus: string
   }) => {
+    const prevLat = location.lat
+    const prevLon = location.lon
+
     setMapCenter({ lat, lon })
-    setLocation({ lat, lon, label: pendingLabel })
     setGpsStatus("Mencari nama lokasi...")
     try {
       const label = await getLocationName(lat, lon)
       setLocation({ lat, lon, label })
       setGpsStatus(successStatus)
-    } catch {
-      setLocation({ lat, lon, label: fallbackLocationName(lat, lon) })
-      setGpsStatus("Nama lokasi tidak tersedia, koordinat dipakai.")
+    } catch (err: any) {
+      if (err.message === "LOKASI_DI_LAUT") {
+        setGpsStatus("Lokasi di laut/perairan tidak dapat dipilih.")
+        toast.error("Lokasi tidak valid", {
+          description: "Lokasi di laut/perairan tidak dapat dipilih. Silakan pilih lokasi di darat.",
+        })
+        // Reset map marker visually to the previous valid location
+        setMapCenter({ lat: prevLat, lon: prevLon })
+      } else {
+        setLocation({ lat, lon, label: pendingLabel })
+        setGpsStatus(successStatus)
+        try {
+          const label = await getLocationName(lat, lon)
+          setLocation({ lat, lon, label })
+        } catch {
+          setLocation({ lat, lon, label: fallbackLocationName(lat, lon) })
+          setGpsStatus("Nama lokasi tidak tersedia, koordinat dipakai.")
+        }
+      }
     }
   }
 
