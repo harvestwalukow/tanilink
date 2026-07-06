@@ -170,6 +170,33 @@ function RecommendationRow({
   )
 }
 
+function CommodityImagePanel({ item }: { item: Recommendation | null }) {
+  if (!item) return null
+
+  const imageSrc = `/assets/images/commodities/${item.komoditas}.png`
+
+  return (
+    <Card className="overflow-hidden rounded-[24px] border-[#d9ccb7] bg-white shadow-sm">
+      <div className="relative h-[180px] w-full overflow-hidden">
+        <img
+          src={imageSrc}
+          alt={commodityLabel(item.komoditas)}
+          className="h-full w-full object-cover transition-transform duration-500 hover:scale-105"
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent" />
+        <div className="absolute bottom-4 left-5">
+          <span className="rounded-md bg-white/20 px-2 py-0.5 text-xs font-semibold text-[#fffaf1] backdrop-blur-md">
+            Komoditas terpilih
+          </span>
+          <h2 className="mt-1 font-[Fraunces] text-3xl font-bold text-[#fffaf1] drop-shadow-sm">
+            {commodityLabel(item.komoditas)}
+          </h2>
+        </div>
+      </div>
+    </Card>
+  )
+}
+
 function SuitabilityPanel({ item }: { item: Recommendation | null }) {
   if (!item) {
     return (
@@ -659,6 +686,7 @@ export function TaniLinkDashboard() {
       </Card>
 
       <div className="grid min-w-0 gap-4 content-start">
+        <CommodityImagePanel item={selectedRecommendation} />
         <SuitabilityPanel item={selectedRecommendation} />
         {forecastError ? (
           <Alert className="rounded-[18px] border-[#fbc4c4] bg-[#fff7f7]">
