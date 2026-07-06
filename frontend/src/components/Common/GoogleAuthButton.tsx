@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react"
+import { Loader2 } from "lucide-react"
 
 import useAuth from "@/hooks/useAuth"
 
@@ -122,14 +123,20 @@ export function GoogleAuthButton() {
           className="pointer-events-none absolute inset-0 flex items-center justify-center px-5 text-sm font-medium text-[#17352b]"
           aria-hidden="true"
         >
-          <div className="absolute left-5 top-1/2 -translate-y-1/2">
-            <GoogleLogo />
-          </div>
-          Lanjutkan dengan Google
+          {googleLoginMutation.isPending ? (
+            <Loader2 className="h-5 w-5 animate-spin text-[#17352b]" />
+          ) : (
+            <>
+              <div className="absolute left-5 top-1/2 -translate-y-1/2">
+                <GoogleLogo />
+              </div>
+              Lanjutkan dengan Google
+            </>
+          )}
         </div>
         <div
           ref={buttonRef}
-          className="absolute inset-0 opacity-0"
+          className={`absolute inset-0 ${googleLoginMutation.isPending ? "pointer-events-none opacity-0" : "opacity-0"}`}
           aria-busy={googleLoginMutation.isPending}
         />
       </div>
