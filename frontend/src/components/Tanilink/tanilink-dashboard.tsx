@@ -213,8 +213,7 @@ function SuitabilityPanel({ item }: { item: Recommendation | null }) {
     <PanelFrame title="Kecocokan Lahan" icon={Sprout}>
       <div className="grid items-center gap-5 rounded-[18px] border border-[#eadfcf] bg-[#fffefb] p-5 sm:grid-cols-[1fr_auto]">
         <div>
-          <div className="text-sm text-[#6c655a]">Komoditas dipilih</div>
-          <div className="mt-2 font-[Fraunces] text-3xl leading-tight text-[#163127]">
+          <div className="font-[Fraunces] text-3xl leading-tight text-[#163127]">
             {commodityLabel(item.komoditas)}
           </div>
           <div className="mt-3 flex flex-wrap gap-2">
