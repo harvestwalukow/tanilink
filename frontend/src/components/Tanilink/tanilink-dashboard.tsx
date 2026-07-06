@@ -1,7 +1,6 @@
 import {
   AlertTriangle,
   BarChart3,
-  Leaf,
   type LucideIcon,
   Sprout,
   TrendingDown,
@@ -114,7 +113,6 @@ function RecommendationRow({
   selected: boolean
   onSelect: () => void
 }) {
-  const color = COMMODITY_COLORS[item.komoditas]
   const badge = sourceBadge(item.sumber_suitability)
 
   return (
