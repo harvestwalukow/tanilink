@@ -150,10 +150,14 @@ export function DashboardLocationPicker({
   triggerClassName,
   contentAlign = "start",
   variant = "header",
+  defaultOpen = false,
+  inline = false,
 }: {
   triggerClassName?: string
   contentAlign?: SelectAlign
   variant?: "header" | "neutral"
+  defaultOpen?: boolean
+  inline?: boolean
 }) {
   const { location, setLocation, hasPickedLocation } = useDashboardFilters()
   const [gpsStatus, setGpsStatus] = useState<string | null>(null)
@@ -306,8 +310,151 @@ export function DashboardLocationPicker({
     ? headerSurfaceClass
     : "border-[#d8ccb7] bg-white text-[#24473b] hover:bg-[#faf6ee] hover:text-[#1c392e] shadow-none"
 
+  const mapContent = (
+    <>
+      <div
+        className="relative h-[260px] overflow-hidden rounded-2xl border border-[#e2d7c4] bg-[#e8decf]"
+        onWheel={handleMapWheel}
+      >
+        <div className="absolute left-3 top-3 z-30 inline-flex rounded-lg border border-[#d8ccb7] bg-white/95 p-0.5 shadow-sm">
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className={cn(
+              "h-7 rounded-md px-2 text-[11px] gap-1",
+              interactionMode === "point"
+                ? "bg-[#24473b] text-[#fffaf1] hover:bg-[#24473b]"
+                : "text-[#5f685b] hover:bg-[#eef4ea]",
+            )}
+            onClick={() => setInteractionMode("point")}
+          >
+            <MousePointer2 className="size-3" />
+            Tunjuk
+          </Button>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className={cn(
+              "h-7 rounded-md px-2 text-[11px] gap-1",
+              interactionMode === "pan"
+                ? "bg-[#24473b] text-[#fffaf1] hover:bg-[#24473b]"
+                : "text-[#5f685b] hover:bg-[#eef4ea]",
+            )}
+            onClick={() => setInteractionMode("pan")}
+          >
+            <Move className="size-3" />
+            Geser
+          </Button>
+        </div>
+        <button
+          type="button"
+          aria-label="Pilih titik lokasi di peta"
+          className={cn(
+            "absolute inset-0 z-10 w-full touch-none text-left",
+            interactionMode === "point"
+              ? "cursor-crosshair"
+              : dragStart
+                ? "cursor-grabbing"
+                : "cursor-grab",
+          )}
+          onClick={handleMapClick}
+          onPointerDown={handleMapPointerDown}
+          onPointerMove={handleMapPointerMove}
+          onPointerUp={handleMapPointerEnd}
+          onPointerCancel={handleMapPointerEnd}
+        >
+          <div
+            className="absolute left-1/2 top-1/2 size-[768px]"
+            style={{
+              transform: `translate(${tileLayerX}px, ${tileLayerY}px)`,
+            }}
+          >
+            {tiles.map((tile) => (
+              <img
+                key={tile.key}
+                src={`https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`}
+                alt=""
+                className="absolute size-64 select-none"
+                draggable={false}
+                style={{ left: tile.left, top: tile.top }}
+              />
+            ))}
+          </div>
+        </button>
+        <div
+          className="pointer-events-none absolute left-1/2 top-1/2 z-20 flex flex-col items-center"
+          style={{
+            transform: `translate(calc(-50% + ${markerX}px), calc(-100% + ${markerY}px))`,
+          }}
+        >
+          <MapPin className="size-9 fill-[#24473b] text-[#24473b] drop-shadow-md" />
+          <span className="mt-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-[#163127] shadow-sm">
+            {location.lat.toFixed(4)}, {location.lon.toFixed(4)}
+          </span>
+        </div>
+        <div className="absolute right-3 top-3 z-30 grid overflow-hidden rounded-xl border border-[#d8ccb7] bg-white shadow-sm">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8 rounded-none text-[#24473b] hover:bg-[#eef4ea]"
+            onClick={zoomIn}
+            aria-label="Perbesar peta"
+          >
+            <Plus className="size-4" />
+          </Button>
+          <div className="h-px bg-[#eadfcf]" />
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            className="size-8 rounded-none text-[#24473b] hover:bg-[#eef4ea]"
+            onClick={zoomOut}
+            aria-label="Perkecil peta"
+          >
+            <Minus className="size-4" />
+          </Button>
+        </div>
+      </div>
+      <div className="mt-2 flex items-center justify-between gap-2">
+        <div className="min-w-0 text-xs text-[#6c655a]">
+          {gpsStatus ??
+            (interactionMode === "point"
+              ? "Klik titik pada peta untuk memilih lokasi."
+              : "Seret peta untuk berpindah area.")}
+        </div>
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          className="h-7 shrink-0 gap-1.5 rounded-xl border-[#d9ccb9] bg-white text-xs"
+          onClick={useGpsLocation}
+        >
+          <LocateFixed className="size-3.5" />
+          Lokasi saya
+        </Button>
+      </div>
+    </>
+  )
+
+  if (inline) {
+    return (
+      <div className="w-full">
+        {mapContent}
+        {hasPickedLocation && location.label ? (
+          <div className="mt-2 flex items-center gap-1.5 text-sm font-medium text-[#24473b]">
+            <MapPin className="size-3.5 shrink-0" />
+            <span className="truncate">{location.label}</span>
+          </div>
+        ) : null}
+      </div>
+    )
+  }
+
   return (
-    <DropdownMenu>
+    <DropdownMenu defaultOpen={defaultOpen}>
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
@@ -352,121 +499,7 @@ export function DashboardLocationPicker({
             Lokasi saya
           </Button>
         </div>
-
-        <div
-          className="relative h-[260px] overflow-hidden rounded-2xl border border-[#e2d7c4] bg-[#e8decf]"
-          onWheel={handleMapWheel}
-        >
-          <div className="absolute left-3 top-3 z-30 inline-flex rounded-lg border border-[#d8ccb7] bg-white/95 p-0.5 shadow-sm">
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              className={cn(
-                "h-7 rounded-md px-2 text-[11px] gap-1",
-                interactionMode === "point"
-                  ? "bg-[#24473b] text-[#fffaf1] hover:bg-[#24473b]"
-                  : "text-[#5f685b] hover:bg-[#eef4ea]",
-              )}
-              onClick={() => setInteractionMode("point")}
-            >
-              <MousePointer2 className="size-3" />
-              Tunjuk
-            </Button>
-            <Button
-              type="button"
-              size="sm"
-              variant="ghost"
-              className={cn(
-                "h-7 rounded-md px-2 text-[11px] gap-1",
-                interactionMode === "pan"
-                  ? "bg-[#24473b] text-[#fffaf1] hover:bg-[#24473b]"
-                  : "text-[#5f685b] hover:bg-[#eef4ea]",
-              )}
-              onClick={() => setInteractionMode("pan")}
-            >
-              <Move className="size-3" />
-              Geser
-            </Button>
-          </div>
-          <button
-            type="button"
-            aria-label="Pilih titik lokasi di peta"
-            className={cn(
-              "absolute inset-0 z-10 w-full touch-none text-left",
-              interactionMode === "point"
-                ? "cursor-crosshair"
-                : dragStart
-                  ? "cursor-grabbing"
-                  : "cursor-grab",
-            )}
-            onClick={handleMapClick}
-            onPointerDown={handleMapPointerDown}
-            onPointerMove={handleMapPointerMove}
-            onPointerUp={handleMapPointerEnd}
-            onPointerCancel={handleMapPointerEnd}
-          >
-            <div
-              className="absolute left-1/2 top-1/2 size-[768px]"
-              style={{
-                transform: `translate(${tileLayerX}px, ${tileLayerY}px)`,
-              }}
-            >
-              {tiles.map((tile) => (
-                <img
-                  key={tile.key}
-                  src={`https://tile.openstreetmap.org/${zoom}/${tile.x}/${tile.y}.png`}
-                  alt=""
-                  className="absolute size-64 select-none"
-                  draggable={false}
-                  style={{ left: tile.left, top: tile.top }}
-                />
-              ))}
-            </div>
-          </button>
-          <div
-            className="pointer-events-none absolute left-1/2 top-1/2 z-20 flex flex-col items-center"
-            style={{
-              transform: `translate(calc(-50% + ${markerX}px), calc(-100% + ${markerY}px))`,
-            }}
-          >
-            <MapPin className="size-9 fill-[#24473b] text-[#24473b] drop-shadow-md" />
-            <span className="mt-1 rounded-full bg-white/95 px-2 py-0.5 text-[10px] font-semibold text-[#163127] shadow-sm">
-              {location.lat.toFixed(4)}, {location.lon.toFixed(4)}
-            </span>
-          </div>
-          <div className="absolute right-3 top-3 z-30 grid overflow-hidden rounded-xl border border-[#d8ccb7] bg-white shadow-sm">
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-8 rounded-none text-[#24473b] hover:bg-[#eef4ea]"
-              onClick={zoomIn}
-              aria-label="Perbesar peta"
-            >
-              <Plus className="size-4" />
-            </Button>
-            <div className="h-px bg-[#eadfcf]" />
-            <Button
-              type="button"
-              variant="ghost"
-              size="icon"
-              className="size-8 rounded-none text-[#24473b] hover:bg-[#eef4ea]"
-              onClick={zoomOut}
-              aria-label="Perkecil peta"
-            >
-              <Minus className="size-4" />
-            </Button>
-          </div>
-        </div>
-        <div className="mt-3 text-xs text-[#6c655a]">
-          <div className="min-w-0">
-            {gpsStatus ??
-              (interactionMode === "point"
-                ? "Mode tunjuk aktif. Klik titik pada peta untuk memilih lokasi."
-                : "Mode geser aktif. Seret peta untuk berpindah area.")}
-          </div>
-        </div>
+        {mapContent}
       </DropdownMenuContent>
     </DropdownMenu>
   )

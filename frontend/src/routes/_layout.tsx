@@ -33,13 +33,24 @@ function LayoutContent() {
   const pathname = useRouterState({
     select: (state) => state.location.pathname,
   })
+  const isRouterPending = useRouterState({
+    select: (state) => state.isLoading,
+  })
   const isOnboardingPage = pathname === "/onboarding"
+  // Hide navbar while on onboarding or while router is still loading after leaving onboarding
+  const showNavbar = !isOnboardingPage && !isRouterPending
   const userName = user?.full_name || user?.email || "TaniLink"
 
   return (
     <div className="app-shell min-h-screen bg-[radial-gradient(circle_at_top_left,_rgba(238,232,212,0.85),_transparent_32%),linear-gradient(180deg,_#fffdf7_0%,_#f9f3e8_100%)]">
       {isOnboardingPage ? null : (
-        <header className="sticky top-0 z-10 flex shrink-0 items-center border-b border-[#0f261f] bg-[#163127] px-3 py-2 shadow-[0_8px_24px_rgba(22,49,39,0.18)] md:px-5">
+        <header
+          className="sticky top-0 z-10 flex shrink-0 items-center border-b border-[#0f261f] bg-[#163127] px-3 py-2 shadow-[0_8px_24px_rgba(22,49,39,0.18)] md:px-5"
+          style={{
+            opacity: showNavbar ? 1 : 0,
+            transition: "opacity 400ms ease-in-out",
+          }}
+        >
           <div className="flex w-full items-center gap-2 sm:gap-3">
             <div className="hidden min-w-[128px] font-[Fraunces] text-2xl font-bold text-[#fffaf1] sm:block">
               TaniLink
@@ -77,7 +88,17 @@ function LayoutContent() {
           </div>
         </header>
       )}
-      <main className={isOnboardingPage ? "min-h-screen p-5" : "p-3 md:p-4"}>
+      <main
+        className={isOnboardingPage ? "min-h-screen p-5" : "p-3 md:p-4"}
+        style={
+          !isOnboardingPage
+            ? {
+                opacity: showNavbar ? 1 : 0,
+                transition: "opacity 400ms ease-in-out",
+              }
+            : undefined
+        }
+      >
         <div
           className={
             isOnboardingPage
