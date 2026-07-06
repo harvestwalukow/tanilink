@@ -129,12 +129,13 @@ function RecommendationRow({
     >
       <div className="flex items-start justify-between gap-3">
         <div className="flex min-w-0 items-start gap-3">
-          <span
-            className="flex size-10 shrink-0 items-center justify-center rounded-full text-white"
-            style={{ backgroundColor: color }}
-          >
-            <Leaf className="size-5" />
-          </span>
+          <div className="flex size-10 shrink-0 items-center justify-center rounded-full border border-[#e4dbc9] bg-white overflow-hidden shadow-xs">
+            <img
+              src={`/assets/images/commodities/icons/${item.komoditas}.png`}
+              alt={commodityLabel(item.komoditas)}
+              className="size-7 object-contain"
+            />
+          </div>
           <span className="min-w-0">
             <span className="block truncate text-sm font-bold text-[#163127]">
               #{item.rank} {commodityLabel(item.komoditas)}
